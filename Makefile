@@ -1,3 +1,5 @@
+submit: cpp_solution
+	bash allsubmit.sh
 
 cpp_solution: solution.exe
 	python src/python/runner.py ./solution.exe problems output
