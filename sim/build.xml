@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns:ivy="antlib:org.apache.ivy.ant"  name="foo" default="jar" basedir=".">
+    <property name="build.src" value="src"/>
+    <property name="build.dest" value="build/classes"/>
+    <property name="project" value="icfpc-sim"/>
+    <property name="version" value="1.0"/>
+    <property name="build.jar" value="sim.jar"/>
+    <property name="lib.dir" value="lib/"/>
+
+    <target name="jar" depends="compile">
+        <jar
+                jarfile="${build.jar}"
+                basedir="${build.dest}">
+            <manifest>
+                <attribute name="Main-Class" value="icfpc.Main"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <path id="classpath">
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    </path>
+
+    <target name="compile" depends="resolve">
+        <mkdir dir="${build.dest}" />
+        <javac srcdir="${build.src}"
+               destdir="${build.dest}"
+               classpathref="classpath"
+                />
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.dest}" />
+        <delete file="${build.jar}" />
+    </target>
+
+    <target name="resolve" description="--> retreive dependencies with ivy">
+        <ivy:retrieve/>
+    </target>
+
+</project>
