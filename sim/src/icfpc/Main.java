@@ -21,9 +21,10 @@ import java.util.Scanner;
  * @author masata
  */
 public class Main {
+    private static final ObjectMapper mapper = new ObjectMapper();
+
     public static void main(final String[] args) throws Exception {
         final ClassLoader classLoader = Main.class.getClassLoader();
-        final ObjectMapper mapper = new ObjectMapper();
         final TypeFactory typeFactory = TypeFactory.defaultInstance();
         final URL inputFile = classLoader.getResource("problems/problem_0.json");
         final URL outputFile = classLoader.getResource("example_output/problem_0.json/output_0.json");
@@ -57,6 +58,7 @@ public class Main {
             }
             if (!interactive) {
                 System.out.print("[");
+                outputJson(board, false);
             }
             for (int i = 0; i < output.solution.length(); i++) {
                 final Command cmd;
@@ -70,10 +72,7 @@ public class Main {
                 System.err.println("[DEBUG]command: " + cmd);
                 board.debug();
                 if (!interactive) {
-                    if (i > 0) {
-                        System.out.print(",");
-                    }
-                    System.out.print(mapper.writeValueAsString(board));
+                    outputJson(board, true);
                 }
                 if (locked) {
                     int unitId = randomizer.next(input.units.size());
@@ -93,5 +92,12 @@ public class Main {
             System.out.println("]");
             System.out.flush();
         }
+    }
+
+    private static void outputJson(final Board board, final boolean preComma) throws Exception {
+        if (preComma) {
+            System.out.print(",");
+        }
+        System.out.print(mapper.writeValueAsString(board));
     }
 }
