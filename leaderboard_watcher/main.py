@@ -30,7 +30,9 @@ def update():
             if leaderboard.find_one(postid):
                 leaderboard.update_one(postid, {'$set': postdata})
             else:
-                leaderboard.insert_one(postdata.update(postid))
+                insertdata = postdata.copy()
+                insertdata.update(postid)
+                leaderboard.insert_one(insertdata)
 
     db.close()
 
