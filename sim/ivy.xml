@@ -1,0 +1,9 @@
+<ivy-module version="2.0">
+    <info organisation="org.apache" module="hello-ivy"/>
+    <dependencies>
+        <dependency org="com.fasterxml.jackson.core" name="jackson-core" rev="2.6.0"/>
+        <dependency org="com.fasterxml.jackson.core" name="jackson-databind" rev="2.6.0"/>
+        <dependency org="com.fasterxml.jackson.core" name="jackson-annotations" rev="2.6.0"/>
+        <dependency org="com.google.guava" name="guava" rev="12.0"/>
+    </dependencies>
+</ivy-module>
