@@ -36,6 +36,9 @@ public class Main {
         }
 
         for (final Output output : outputs) {
+            if (!interactive) {
+                System.out.print("[");
+            }
             final Board board = new Board(input.width, input.height, FluentIterable.from(input.filled).transform(new Function<OriginalCell, Cell>() {
                 @Nullable
                 @Override
@@ -54,11 +57,10 @@ public class Main {
                 } else {
                     System.err.println("[DEBUG]SPAWN UNIT ID: " + unitId);
                     board.debug();
+                    if (!interactive){
+                        outputJson(board, false);
+                    }
                 }
-            }
-            if (!interactive) {
-                System.out.print("[");
-                outputJson(board, false);
             }
             for (int i = 0; i < output.solution.length(); i++) {
                 final Command cmd;
@@ -83,6 +85,9 @@ public class Main {
                     } else {
                         System.err.println("[DEBUG]SPAWN UNIT ID: " + unitId);
                         board.debug();
+                        if (!interactive){
+                            outputJson(board, true);
+                        }
                     }
                 }
             }
