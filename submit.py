@@ -5,7 +5,10 @@ import urllib
 
 def main():
     solution = sys.stdin.read()
-    data = urllib.urlencode({'solution': solution})
+    datadic = {'solution': solution}
+    if len(sys.argv) == 2:
+        datadic['comment'] = sys.argv[1]
+    data = urllib.urlencode(datadic)
 
     handler = urllib2.HTTPHandler()
     opener = urllib2.build_opener(handler)
