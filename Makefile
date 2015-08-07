@@ -1,12 +1,19 @@
-submit: cpp_solution
+visdump: solution
+	mkdir visdump
+	python src/python/visdump.py sim/run.py problems output visdump
+
+submit: solution
 	bash allsubmit.sh
 
-cpp_solution: solution.exe
+solution: solution.exe
+	mkdir output
 	python src/python/runner.py ./solution.exe problems output
 
-sample_solution:
-	python src/python/runner.py src/python/sample_solution.py problems output
-
-CPP_SOURCE=src/cpp/main.cpp
+CPP_SOURCE=ai/ai.cpp
 solution.exe: $(CPP_SOURCE)
-	c++ -O3 -o $@ $<
+	c++ -o $@ $<
+
+clean:
+	rm solution.exe
+	rm -r output
+	rm -r visdump
