@@ -13,6 +13,7 @@ import icfpc.io.Output;
 import icfpc.random.Randomizer;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.Scanner;
@@ -26,14 +27,18 @@ public class Main {
     public static void main(final String[] args) throws Exception {
         final ClassLoader classLoader = Main.class.getClassLoader();
         final TypeFactory typeFactory = TypeFactory.defaultInstance();
-        final URL inputFile = classLoader.getResource("problems/problem_0.json");
-        final URL outputFile = classLoader.getResource("example_output/problem_0.json/output_0.json");
-        final Input input = mapper.readValue(inputFile, Input.class);
-        final List<Output> outputs = mapper.readValue(outputFile, typeFactory.constructCollectionType(List.class, Output.class));
+        URL inputFile = classLoader.getResource("problems/problem_0.json");
+        URL outputFile = classLoader.getResource("example_output/problem_0.json/output_0.json");
         boolean interactive = false;
         if (args.length > 0 && args[0].equals("-i")) {
             interactive = true;
+        } else if (args.length > 1) {
+            System.err.println("inputFile: " + inputFile);
+            inputFile = new File(args[0]).toURI().toURL();
+            outputFile = new File(args[1]).toURI().toURL();
         }
+        final Input input = mapper.readValue(inputFile, Input.class);
+        final List<Output> outputs = mapper.readValue(outputFile, typeFactory.constructCollectionType(List.class, Output.class));
 
         for (final Output output : outputs) {
             if (!interactive) {
