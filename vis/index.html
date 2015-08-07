@@ -10,6 +10,11 @@
         <h1>Sakimori</h1>
         <div style="display: flex">
             <div>
+                <div style="text-align: center;">
+                    <button id="prev-button">&lt;</button>
+                    <input id="current-state" type="text" style="width: 40px;">
+                    <button id="next-button">&gt;</button>
+                </div>
                 <canvas id="canvas" width="800" height="500" style="border: 1px solid black;"></canvas>
             </div>
             <div style="margin-left: 10px;">
@@ -19,7 +24,7 @@
                 <div>
                     <h2>Simulator output visualize</h2>
                     <textarea id="simulator-out" placeholder="Simulator Output"></textarea><br>
-                    <button id="simulator">Show it</button>
+                    <button id="simulator">Load</button>
                 <div>
                 <div style="margin-top: 20px;">
                     <h2>Show initial state</h2>
