@@ -49,8 +49,11 @@
     }
 
     function drawBoard(board) {
-        for(var r = 0; r < 10; ++r) {
-            for(var c = 0; c < 5; ++c) {
+	canvas.width = board.width * HEX_WIDTH + HEX_SIZE*3;
+	canvas.height = board.height * HEX_HEIGHT + HEX_SIZE*3;
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for(var r = 0; r < board.height; ++r) {
+            for(var c = 0; c < board.width; ++c) {
                 var drawPos = getDrawPosition({y: r, x: c});
                 drawEmptyCell(drawPos.x, drawPos.y);
             }
@@ -61,10 +64,39 @@
         });
     }
 
+    function initProblemSelector() {
+	// Setup problem list
+	var selector = $('#problem-selector');
+	for(var i = 0; i <= 23; ++i) {
+	    selector.append($('<option value="' + i + '" name="problem-id">problem_' + i + '.json</option>'));
+	}
+
+	selector.change(function() {
+	    var id = $('#problem-selector').val();
+	    $.ajax({
+		url: '/sakimori/problems/problem_' + id + '.json',
+		contentType: 'text/json'
+	    }).done(function(obj) {
+		drawBoard({
+		    height: obj.height,
+		    width: obj.width,
+		    fullCells: obj.filled
+		});
+	    });
+	});
+    }
+
     $(document).ready(function() {
         canvas = $('#canvas').get(0);
         ctx = canvas.getContext('2d');
+	$.ajax({
+		url: '/sakimori/problems/problem_0.json',
+		contentType: 'text/json'
+	}).done(function(e) {
+		console.log(e);
+	});
 
+	// Setup simulator action
         $('#simulator').click(function() {
             var raw = $('#simulator-out').val();
             eval('json = ' + raw);
@@ -72,5 +104,7 @@
             console.log(json);
             drawBoard(json);
         });
+
+	initProblemSelector();
     });
 })();

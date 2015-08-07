@@ -2,14 +2,26 @@
     <head>
         <script type="text/javascript" src="jquery.min.js"></script>
         <script type="text/javascript" src="draw.js"></script>
+        <style type="text/css">
+        h2 { margin-top: 0; }
+        </style>
     </head>
     <body>
         <h1>Sakimori</h1>
         <div style="display: flex">
-            <canvas id="canvas" width="800" height="800" style="border: 1px solid black;"></canvas>
-            <div>
-                <textarea id="simulator-out" placeholder="Simulator Output"></textarea><br>
-                <button id="simulator">Show it</button>
+            <div style="width: 800px; overflow: scroll">
+                <canvas id="canvas" width="800" height="500" style="border: 1px solid black;"></canvas>
+            </div>
+            <div style="margin-left: 10px;">
+                <div>
+                    <h2>Simulator output visualize</h2>
+		            <textarea id="simulator-out" placeholder="Simulator Output"></textarea><br>
+                    <button id="simulator">Show it</button>
+                <div>
+                <div style="margin-top: 20px;">
+                    <h2>Show initial state</h2>
+                    <select id="problem-selector"></select>
+                </div>
             </div>
         </div>
     </body>
