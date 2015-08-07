@@ -1,14 +1,21 @@
 package icfpc.common;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -16,6 +23,7 @@ import java.util.Set;
  * @author masata
  */
 @JsonSerialize(using = Board.Serializer.class)
+@JsonDeserialize(using = Board.Deserializer.class)
 public class Board {
     private final int width;
     private final int height;
@@ -246,6 +254,22 @@ public class Board {
             }
             gen.writeEndArray();
             gen.writeEndObject();
+        }
+    }
+
+    public static class Deserializer extends JsonDeserializer<Board> {
+        @Override
+        public Board deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+            JsonNode root = p.getCodec().readTree(p);
+            final int width = root.get("width").asInt();
+            final int height = root.get("height").asInt();
+            final List<Cell> filled = new ArrayList<>();
+            for (final Iterator<JsonNode> it = root.get("fullCells").elements(); it.hasNext(); ) {
+                final JsonNode node = it.next();
+                final Cell cell = new Cell(node.get("x").asInt(), node.get("y").asInt());
+                filled.add(cell);
+            }
+            return new Board(width, height, filled);
         }
     }
 }
