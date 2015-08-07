@@ -27,7 +27,7 @@ def translate_single(config, seed):
     print >> output, config['sourceLength']
     rand = Rand(seed)
     for i in xrange(config['sourceLength']):
-        print >> output, rand.get()
+        print >> output, rand.get() % len(config['units'])
     return output.getvalue()
 
 
