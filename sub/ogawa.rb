@@ -5,7 +5,8 @@ require 'net/http'
 require 'slim'
 require 'pp'
 require 'fileutils'
-require_relative 'env.rb'
+require_relative 'env'
+require_relative 'lib/post'
 
 API_TOKEN = 'yvNVFcvQWZGrDZKWRuA786nhrj3BA35kHbJIDsukAb0='.freeze
 URL = 'https://davar.icfpcontest.org/teams/59/solutions'.freeze
@@ -34,7 +35,7 @@ post '/solution' do
       now = Time.now.strftime('%Y-%m-%d-%H%M%S')
       filename = "#{now}.json"
       File.open(File.join(STORAGE_PATH, filename), 'w') do |f|
-        f.puts(params['solution'])
+        f.puts(Ogawa::Post.new(solution: params['solution'], comment: params['comment']).to_json)
       end
       session[:posted] = filename
       redirect to(Ogawa::ROOT)
