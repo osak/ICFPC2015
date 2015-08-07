@@ -41,7 +41,7 @@ class Unit {
     vector <Point> member;
 };
 
-const int beamWidth = 10;
+const int beamWidth = 1;
 int H, W;
 int pxx[6] = {1, 1, 0, -1, -1, 0};
 int pxy[6] = {0, 1, 1, 0, -1, -1};
@@ -62,7 +62,7 @@ int calc(vector <vector <int> > &field, int num) {
 }
 
 void init(Unit &unit) {
-    int topx = 1e9, lefty = 0, righty = 0, i;
+    int topx = 1e9, lefty = 1e9, righty = 1e9, i;
     
     for (i = 0; i < unit.member.size(); i++) {
         if (unit.pivot.x % 2 == 0) {
@@ -71,8 +71,8 @@ void init(Unit &unit) {
             unit.member[i].y = unit.member[i].y - unit.pivot.y - (unit.member[i].x - unit.pivot.x + 1) / 2;
         }
         
-        unit.member[i].x -= unit.pivot.x;
         topx = min(topx, unit.member[i].x);
+        unit.member[i].x -= unit.pivot.x;
     }
     
     unit.pivot.x -= topx;
@@ -80,14 +80,14 @@ void init(Unit &unit) {
     for (i = 0; i < unit.member.size(); i++) {
         int y = unit.pivot.y + unit.member[i].y + (unit.pivot.x + unit.member[i].x) / 2;
         
-        lefty = max(lefty, y);
-        righty = max(righty, W - y - 1);
+        lefty = min(lefty, y);
+        righty = min(righty, W - y - 1);
     }
     
     if (lefty >= righty) {
         unit.pivot.y -= (lefty - righty + 1) / 2;
     } else {
-        unit.pivot.y -= (righty - lefty) / 2;
+        unit.pivot.y += (righty - lefty) / 2;
     }
 }
 
@@ -208,7 +208,7 @@ int main()
         
         scanf("%d", &id);
         
-        source.push_back(id);
+        if (i == 0)source.push_back(id);
     }
     
     initBoard.currentScore = initBoard.previousLine = 0;
@@ -350,7 +350,7 @@ int main()
         swap(que, queNext);
     }
     
-    if (que.top().currentScore > maxScore) ans = que.top().commands;
+    if (!que.empty() && que.top().currentScore > maxScore) ans = que.top().commands;
     
     printf("%s\n", ans.c_str());
     
