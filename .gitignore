@@ -108,4 +108,5 @@ docs/_build/
 # PyBuilder
 target/
 
-
+# Backup
+*~
