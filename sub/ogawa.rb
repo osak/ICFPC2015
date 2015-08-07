@@ -7,6 +7,7 @@ require 'pp'
 require 'fileutils'
 require_relative 'env'
 require_relative 'lib/post'
+require_relative 'lib/db'
 
 API_TOKEN = 'yvNVFcvQWZGrDZKWRuA786nhrj3BA35kHbJIDsukAb0='.freeze
 URL = 'https://davar.icfpcontest.org/teams/59/solutions'.freeze
@@ -16,6 +17,10 @@ enable :sessions
 
 if !File.exists?(STORAGE_PATH)
   FileUtils.mkdir(STORAGE_PATH)
+end
+
+def db
+  @database ||= Ogawa::Database.new
 end
 
 get '/' do
@@ -43,4 +48,9 @@ post '/solution' do
       raise Exception, res
     end
   end
+end
+
+get '/history' do
+  @posts = db.read_post
+  slim :list
 end
