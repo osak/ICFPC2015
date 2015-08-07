@@ -13,7 +13,7 @@ import icfpc.io.Output;
 import icfpc.random.Randomizer;
 
 import javax.annotation.Nullable;
-import java.io.File;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -21,10 +21,11 @@ import java.util.List;
  */
 public class Main {
     public static void main(final String[] args) throws Exception {
+        final ClassLoader classLoader = Main.class.getClassLoader();
         final ObjectMapper mapper = new ObjectMapper();
         final TypeFactory typeFactory = TypeFactory.defaultInstance();
-        final File inputFile = new File("/home/masata/dev/icfpc/ICFPC2015/problems/problem_0.json");
-        final File outputFile = new File("/home/masata/dev/icfpc/ICFPC2015/example_output/problem_0.json/output_0.json");
+        final URL inputFile = classLoader.getResource("problems/problem_0.json");
+        final URL outputFile = classLoader.getResource("example_output/problem_0.json/output_0.json");
         final Input input = mapper.readValue(inputFile, Input.class);
         final List<Output> outputs = mapper.readValue(outputFile, typeFactory.constructCollectionType(List.class, Output.class));
 
