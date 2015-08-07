@@ -15,6 +15,7 @@ import icfpc.random.Randomizer;
 import javax.annotation.Nullable;
 import java.net.URL;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * @author masata
@@ -28,6 +29,10 @@ public class Main {
         final URL outputFile = classLoader.getResource("example_output/problem_0.json/output_0.json");
         final Input input = mapper.readValue(inputFile, Input.class);
         final List<Output> outputs = mapper.readValue(outputFile, typeFactory.constructCollectionType(List.class, Output.class));
+        boolean interactive = false;
+        if (args.length > 0 && args[0].equals("-i")) {
+            interactive = true;
+        }
 
         for (final Output output : outputs) {
             final Board board = new Board(input.width, input.height, FluentIterable.from(input.filled).transform(new Function<OriginalCell, Cell>() {
@@ -50,18 +55,26 @@ public class Main {
                     board.debug();
                 }
             }
-            System.out.print("[");
+            if (!interactive) {
+                System.out.print("[");
+            }
             for (int i = 0; i < output.solution.length(); i++) {
-                final Command cmd = Command.fromChar(output.solution.charAt(i));
-                //Scanner scanner = new Scanner(System.in);
-                //final Command cmd = Command.fromChar(scanner.nextLine().charAt(0));
+                final Command cmd;
+                if (interactive) {
+                    Scanner scanner = new Scanner(System.in);
+                    cmd = Command.fromChar(scanner.nextLine().charAt(0));
+                } else {
+                    cmd = Command.fromChar(output.solution.charAt(i));
+                }
                 boolean locked = !board.operate(cmd);
                 System.err.println("[DEBUG]command: " + cmd);
                 board.debug();
-                if (i > 0) {
-                    System.out.print(",");
+                if (!interactive) {
+                    if (i > 0) {
+                        System.out.print(",");
+                    }
+                    System.out.print(mapper.writeValueAsString(board));
                 }
-                System.out.print(mapper.writeValueAsString(board));
                 board.debug();
                 if (locked) {
                     int unitId = randomizer.next(input.units.size());
@@ -75,9 +88,11 @@ public class Main {
                     }
                 }
             }
+            break;
+        }
+        if (!interactive) {
             System.out.println("]");
             System.out.flush();
-            break;
         }
     }
 }
