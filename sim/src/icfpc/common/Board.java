@@ -278,16 +278,16 @@ public class Board {
             final List<Cell> filled = new ArrayList<>();
             for (final Iterator<JsonNode> it = root.get("fullCells").elements(); it.hasNext(); ) {
                 final JsonNode node = it.next();
-                final Cell cell = new Cell(node.get("x").asInt(), node.get("y").asInt());
+                final Cell cell = new OriginalCell(node.get("x").asInt(), node.get("y").asInt()).toCell();
                 filled.add(cell);
             }
             final List<Cell> unitCells = new ArrayList<>();
             for (final Iterator<JsonNode> it = root.get("unitCells").elements(); it.hasNext(); ) {
                 final JsonNode node = it.next();
-                final Cell cell = new Cell(node.get("x").asInt(), node.get("y").asInt());
+                final Cell cell = new OriginalCell(node.get("x").asInt(), node.get("y").asInt()).toCell();
                 unitCells.add(cell);
             }
-            final Cell pivot = new Cell(root.get("pivot").get("x").asInt(), root.get("pivot").get("y").asInt());
+            final Cell pivot = new OriginalCell(root.get("pivot").get("x").asInt(), root.get("pivot").get("y").asInt()).toCell();
             final Board ret = new Board(width, height, filled);
             final Unit unit = new Unit(FluentIterable.from(unitCells).transform(new Function<Cell, OriginalCell>() {
                 @Nullable
