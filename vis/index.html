@@ -9,13 +9,16 @@
     <body>
         <h1>Sakimori</h1>
         <div style="display: flex">
-            <div style="width: 800px; overflow: scroll">
+            <div>
                 <canvas id="canvas" width="800" height="500" style="border: 1px solid black;"></canvas>
             </div>
             <div style="margin-left: 10px;">
                 <div>
+                    <input id="scale" type="checkbox" name="scale" checked><label for="scale">Scale</label>
+                </div>
+                <div>
                     <h2>Simulator output visualize</h2>
-		            <textarea id="simulator-out" placeholder="Simulator Output"></textarea><br>
+                    <textarea id="simulator-out" placeholder="Simulator Output"></textarea><br>
                     <button id="simulator">Show it</button>
                 <div>
                 <div style="margin-top: 20px;">
