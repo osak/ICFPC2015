@@ -2,6 +2,7 @@ import json
 import sys
 from StringIO import StringIO
 
+
 class Rand(object):
     def __init__(self, seed):
         self.state = seed
@@ -48,7 +49,7 @@ def main():
     if len(sys.argv) == 2:
         print translate(config)
     else:
-        print translate_single(config, int(sys.argv[2]))
+        print translate_single(config, config['sourceSeeds'][int(sys.argv[2])])
 
 
 if __name__ == '__main__':
