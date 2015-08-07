@@ -208,7 +208,7 @@ int main()
         
         scanf("%d", &id);
         
-        if (i == 0)source.push_back(id);
+        source.push_back(id);
     }
     
     initBoard.currentScore = initBoard.previousLine = 0;
@@ -232,6 +232,7 @@ int main()
                 ans = board.commands;
             }
             
+            parent[make_pair(units[source[i]].pivot, 0)] = -1;
             queBFS.push(make_pair(units[source[i]].pivot, 0));
             
             while (!queBFS.empty()) {
@@ -266,9 +267,9 @@ int main()
                         int nowTheta = theta;
                         string commands = "";
                         while (1) {
-                            if (!parent.count(make_pair(nowPoint, nowTheta))) break;
-                            
                             int commandNum = parent[make_pair(nowPoint, nowTheta)];
+                            
+                            if (commandNum == -1) break;
                             
                             if (commandNum <= 3) {
                                 commands += commandMove[commandNum];
@@ -313,9 +314,9 @@ int main()
                         int nowTheta = theta;
                         string commands = "";
                         while (1) {
-                            if (!parent.count(make_pair(nowPoint, nowTheta))) break;
-                            
                             int commandNum = parent[make_pair(nowPoint, nowTheta)];
+                            
+                            if (commandNum == -1) break;
                             
                             if (commandNum <= 3) {
                                 commands += commandMove[commandNum];
