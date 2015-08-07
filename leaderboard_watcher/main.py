@@ -2,9 +2,8 @@ import time
 import urllib2
 import json
 from pymongo import MongoClient
+from config import MONGO_URI, TEAM_ID
 
-TEAM_ID = 59
-MONGO_URI = 'mongodb://localhost:27017/'
 
 
 def get_json():
@@ -29,10 +28,8 @@ def update():
             postdata = {'problem_id': setting_id, 'power': power, 'score': score, '_id': tag}
             postid = {'_id': tag}
             if leaderboard.find_one(postid):
-                print 'update'
                 leaderboard.update_one(postid, {'$set': postdata})
             else:
-                print 'insert'
                 leaderboard.insert_one(postdata.update(postid))
 
     db.close()
