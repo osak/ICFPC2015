@@ -15,12 +15,13 @@ for cs in mapper:
 if __name__ == '__main__':
     s = raw_input()
     for c in s:
+        c = c.lower()
         if c not in valid:
             print '!!! invalid character:', c
             exit(1)
         for cset, name in mapper.items():
             if name == 'ignored':
                 continue
-            if c.lower() in cset:
+            if c in cset:
                 print name
 
