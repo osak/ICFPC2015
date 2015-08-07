@@ -253,6 +253,15 @@ public class Board {
                 gen.writeEndObject();
             }
             gen.writeEndArray();
+            gen.writeNumberField("width", value.width);
+            gen.writeNumberField("height", value.height);
+            if (value.currentUnitPivot != null) {
+                gen.writeFieldName("pivot");
+                gen.writeStartObject();
+                gen.writeNumberField("x", value.currentUnitPivot.toOriginalCell().x);
+                gen.writeNumberField("y", value.currentUnitPivot.toOriginalCell().y);
+                gen.writeEndObject();
+            }
             gen.writeEndObject();
         }
     }
