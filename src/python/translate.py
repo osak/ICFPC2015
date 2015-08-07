@@ -38,13 +38,17 @@ def translate(config):
 
 
 def main():
-    if len(sys.argv) != 2:
-        print >>sys.stderr, '[USAGE] {} [input.json]'.format(sys.argv[0])
+    if not (2 <= len(sys.argv) <= 3):
+        print >>sys.stderr, '[USAGE] {} [input.json] [seed id]'.format(sys.argv[0])
+        print >>sys.stderr, 'use seed id to specify seed. if not specified, input for all seed is generated.'
         exit(1)
     path = sys.argv[1]
     with open(path) as reader:
         config = json.load(reader)
-    print translate(config)
+    if len(sys.argv) == 2:
+        print translate(config)
+    else:
+        print translate_single(config, int(sys.argv[2]))
 
 
 if __name__ == '__main__':
