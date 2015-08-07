@@ -110,3 +110,6 @@ target/
 
 # Backup
 *~
+
+# Output
+output
