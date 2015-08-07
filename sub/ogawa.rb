@@ -5,6 +5,7 @@ require 'net/http'
 require 'slim'
 require 'pp'
 require 'fileutils'
+require_relative 'env.rb'
 
 API_TOKEN = 'yvNVFcvQWZGrDZKWRuA786nhrj3BA35kHbJIDsukAb0='.freeze
 URL = 'https://davar.icfpcontest.org/teams/59/solutions'.freeze
@@ -36,7 +37,7 @@ post '/solution' do
         f.puts(params['solution'])
       end
       session[:posted] = filename
-      redirect to('/')
+      redirect to(Ogawa::ROOT)
     else
       raise res
     end
