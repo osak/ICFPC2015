@@ -26,10 +26,15 @@ def update():
             power = submission['power_score']
             score = submission['score']
             tag = submission['tags'][0]
-            post = {'problem_id': setting_id, 'power': power, 'score': score, 'tag': tag}
-            if not leaderboard.find_one(post):
-                print post
-                leaderboard.insert_one(post)
+            postdata = {'problem_id': setting_id, 'power': power, 'score': score, '_id': tag}
+            postid = {'_id': tag}
+            if leaderboard.find_one(postid):
+                print 'update'
+                leaderboard.update_one(postid, {'$set': postdata})
+            else:
+                print 'insert'
+                leaderboard.insert_one(postdata.update(postid))
+
     db.close()
 
 
