@@ -4,7 +4,7 @@ import json
 from pymongo import MongoClient
 
 TEAM_ID = 59
-MONGO_URI = ''
+MONGO_URI = 'mongodb://localhost:27017/'
 
 
 def get_json():
@@ -14,8 +14,9 @@ def get_json():
 
 def update():
     data = get_json()
-    db = MongoClient()
-    leaderboard = db.leaderboard
+    db = MongoClient(MONGO_URI)
+    leaderboarddb = db.leaderboard
+    leaderboard = leaderboarddb.leaderboard
     for setting in data['data']['settings']:
         setting_id = setting['setting']
         ranking = setting['rankings']
@@ -26,7 +27,9 @@ def update():
             score = submission['score']
             tag = submission['tags'][0]
             post = {'problem_id': setting_id, 'power': power, 'score': score, 'tag': tag}
-            leaderboard.update_one(post, upsert=True)
+            if not leaderboard.find_one(post):
+                print post
+                leaderboard.insert_one(post)
     db.close()
 
 
