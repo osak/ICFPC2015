@@ -25,7 +25,7 @@ def update():
             power = submission['power_score']
             score = submission['score']
             tag = submission['tags'][0]
-            postdata = {'problem_id': setting_id, 'power': power, 'score': score, '_id': tag}
+            postdata = {'problem_id': setting_id, 'power': power, 'score': score}
             postid = {'_id': tag}
             if leaderboard.find_one(postid):
                 leaderboard.update_one(postid, {'$set': postdata})
