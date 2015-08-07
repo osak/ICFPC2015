@@ -1,4 +1,3 @@
 build
 out
-lib
-sim.jar
+!lib
