@@ -40,7 +40,7 @@ post '/solution' do
       session[:posted] = filename
       redirect to(Ogawa::ROOT)
     else
-      raise res
+      raise Exception, res
     end
   end
 end
