@@ -75,7 +75,6 @@ public class Main {
                     }
                     System.out.print(mapper.writeValueAsString(board));
                 }
-                board.debug();
                 if (locked) {
                     int unitId = randomizer.next(input.units.size());
                     boolean gameEnded = !board.spawn(input.units.get(unitId));

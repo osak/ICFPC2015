@@ -5,7 +5,11 @@ package icfpc.common;
  */
 public class OriginalCell {
     public static OriginalCell fromCell(final Cell c) {
-        return new OriginalCell(c.x / 2, c.y);
+        if (c.x >= 0) {
+            return new OriginalCell(c.x / 2, c.y);
+        } else {
+            return new OriginalCell(-((-c.x + 1) / 2), c.y);
+        }
     }
 
     public int x;

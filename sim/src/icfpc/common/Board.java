@@ -170,12 +170,17 @@ public class Board {
             }
         }
 
+        final StringBuilder sb = new StringBuilder();
         if (currentUnitPivot != null) {
-            OriginalCell pivotOc = currentUnitPivot.toOriginalCell();
-            f[pivotOc.x][pivotOc.y] = f[pivotOc.x][pivotOc.y] == '.' ? '~' : '@';
+            final OriginalCell ocPivot = currentUnitPivot.toOriginalCell();
+            if (ocPivot.x >= 0 && ocPivot.x < width && ocPivot.y >= 0 && ocPivot.y < height) {
+                f[ocPivot.x][ocPivot.y] = f[ocPivot.x][ocPivot.y] == '.' ? '~' : '@';
+            } else {
+                sb.append("=======================\n");
+                sb.append(String.format("pivot: (%d, %d)\n", ocPivot.x, ocPivot.y));
+            }
         }
 
-        final StringBuilder sb = new StringBuilder();
         for (int y = 0; y < height; y++) {
             if (y % 2 != 0) {
                 sb.append(' ');
