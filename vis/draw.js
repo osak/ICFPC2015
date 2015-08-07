@@ -49,6 +49,16 @@
         drawHex(x, y);
     }
 
+    function drawPivot(x, y) {
+        setLineColor('gray');
+        setFillColor('gray');
+        ctx.beginPath();
+        ctx.arc(x, y, HEX_SIZE / 4, 0, 2 * Math.PI, true);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    }
+
     function getDrawPosition(pos) {
         var offset = (pos.y % 2 == 0) ? 0 : HEX_WIDTH / 2;
         return {
@@ -85,6 +95,10 @@
             var drawPos = getDrawPosition(e);
             drawUnitCell(drawPos.x, drawPos.y);
         });
+        {
+            var drawPos = getDrawPosition(board.pivot);
+            drawPivot(drawPos.x, drawPos.y);
+        }
     }
 
     function initProblemSelector() {
