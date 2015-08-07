@@ -1,6 +1,8 @@
 (function() {
     var canvas;
     var ctx;
+    var history;
+    var boardIndex;
     var HEX_SIZE = 20;
     var HEX_WIDTH = HEX_SIZE * Math.sqrt(3);
     var HEX_HEIGHT = HEX_SIZE * 1.5;
@@ -41,6 +43,12 @@
         drawHex(x, y);
     }
 
+    function drawUnitCell(x, y) {
+        setLineColor('black');
+        setFillColor('red');
+        drawHex(x, y);
+    }
+
     function getDrawPosition(pos) {
         var offset = (pos.y % 2 == 0) ? 0 : HEX_WIDTH / 2;
         return {
@@ -73,6 +81,10 @@
             var drawPos = getDrawPosition(e);
             drawFullCell(drawPos.x, drawPos.y);
         });
+        board.unitCells.forEach(function(e) {
+            var drawPos = getDrawPosition(e);
+            drawUnitCell(drawPos.x, drawPos.y);
+        });
     }
 
     function initProblemSelector() {
@@ -97,6 +109,15 @@
         });
     }
 
+    function setBoardIndex(index) {
+        if(index < 0 || index > history.length) {
+            return false;
+        }
+        boardIndex = index;
+        $('#current-state').val(index);
+        drawBoard(history[boardIndex]);
+    }
+
     $(document).ready(function() {
         canvas = $('#canvas').get(0);
         ctx = canvas.getContext('2d');
@@ -104,10 +125,23 @@
         // Setup simulator action
         $('#simulator').click(function() {
             var raw = $('#simulator-out').val();
-            eval('json = ' + raw);
-            console.log(raw);
-            console.log(json);
-            drawBoard(json);
+            eval('history = ' + raw);
+            setBoardIndex(0);
+        });
+
+        $('#prev-button').click(function() {
+            setBoardIndex(boardIndex - 1);
+        });
+        $('#next-button').click(function() {
+            setBoardIndex(boardIndex + 1);
+        });
+        $('#current-state').focusout(function() {
+            setBoardIndex(parseInt(this.value));
+        });
+        $('#current-state').keypress(function(e) {
+            if(e.keyCode == 13) {
+                setBoardIndex(parseInt(this.value));
+            }
         });
 
         initProblemSelector();
