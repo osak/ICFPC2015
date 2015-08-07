@@ -31,18 +31,25 @@ end
 
 post '/solution' do
   Net::HTTP.new('davar.icfpcontest.org', 443).tap{|h| h.use_ssl=true}.start do |http|
+    timestamp = Time.now.to_i
+    json_org = params['solution']
+    json_post = JSON.parse(params['solution'])
+    json_post[0]['tag'] = timestamp.to_s
+
     req = Net::HTTP::Post.new('/teams/59/solutions')
     req['Content-Type'] = 'application/json'
     req.basic_auth '', API_TOKEN
-    req.body = params['solution']
+    req.body = json_post.to_json
+    pp req.body
     res = http.request(req)
+
     if res.header.is_a?(Net::HTTPCreated)
-      now = Time.now.strftime('%Y-%m-%d-%H%M%S')
-      filename = "#{now}.json"
-      File.open(File.join(STORAGE_PATH, filename), 'w') do |f|
-        f.puts(Ogawa::Post.new(solution: params['solution'], comment: params['comment']).to_json)
-      end
-      session[:posted] = filename
+      db.write_post(Ogawa::Post.new(
+        id: timestamp,
+        solution: json_org,
+        comment: params['comment']
+      ))
+      session[:posted] = timestamp
       redirect to(Ogawa::ROOT)
     else
       raise Exception, res

@@ -2,7 +2,7 @@ html
   body
     - if session[:posted]
       div style="border: 1px solid black; border-radius: 10px;"
-        p= "Successfully posted.  Saved as #{session[:posted]}."
+        p= "Successfully posted.  Tag: #{session[:posted]}"
     form action="solution" method="post"
       textarea#solution name="solution" placeholder="Solution" style="height: 300px; width: 200px"
       br
