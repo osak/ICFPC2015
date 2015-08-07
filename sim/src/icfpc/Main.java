@@ -13,6 +13,7 @@ import icfpc.io.Output;
 import icfpc.random.Randomizer;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.Scanner;
@@ -21,20 +22,28 @@ import java.util.Scanner;
  * @author masata
  */
 public class Main {
+    private static final ObjectMapper mapper = new ObjectMapper();
+
     public static void main(final String[] args) throws Exception {
         final ClassLoader classLoader = Main.class.getClassLoader();
-        final ObjectMapper mapper = new ObjectMapper();
         final TypeFactory typeFactory = TypeFactory.defaultInstance();
-        final URL inputFile = classLoader.getResource("problems/problem_0.json");
-        final URL outputFile = classLoader.getResource("example_output/problem_0.json/output_0.json");
-        final Input input = mapper.readValue(inputFile, Input.class);
-        final List<Output> outputs = mapper.readValue(outputFile, typeFactory.constructCollectionType(List.class, Output.class));
+        URL inputFile = classLoader.getResource("problems/problem_0.json");
+        URL outputFile = classLoader.getResource("example_output/problem_0.json/output_0.json");
         boolean interactive = false;
         if (args.length > 0 && args[0].equals("-i")) {
             interactive = true;
+        } else if (args.length > 1) {
+            System.err.println("inputFile: " + inputFile);
+            inputFile = new File(args[0]).toURI().toURL();
+            outputFile = new File(args[1]).toURI().toURL();
         }
+        final Input input = mapper.readValue(inputFile, Input.class);
+        final List<Output> outputs = mapper.readValue(outputFile, typeFactory.constructCollectionType(List.class, Output.class));
 
         for (final Output output : outputs) {
+            if (!interactive) {
+                System.out.print("[");
+            }
             final Board board = new Board(input.width, input.height, FluentIterable.from(input.filled).transform(new Function<OriginalCell, Cell>() {
                 @Nullable
                 @Override
@@ -53,10 +62,10 @@ public class Main {
                 } else {
                     System.err.println("[DEBUG]SPAWN UNIT ID: " + unitId);
                     board.debug();
+                    if (!interactive){
+                        outputJson(board, false);
+                    }
                 }
-            }
-            if (!interactive) {
-                System.out.print("[");
             }
             for (int i = 0; i < output.solution.length(); i++) {
                 final Command cmd;
@@ -70,10 +79,7 @@ public class Main {
                 System.err.println("[DEBUG]command: " + cmd);
                 board.debug();
                 if (!interactive) {
-                    if (i > 0) {
-                        System.out.print(",");
-                    }
-                    System.out.print(mapper.writeValueAsString(board));
+                    outputJson(board, true);
                 }
                 if (locked) {
                     int unitId = randomizer.next(input.units.size());
@@ -84,6 +90,9 @@ public class Main {
                     } else {
                         System.err.println("[DEBUG]SPAWN UNIT ID: " + unitId);
                         board.debug();
+                        if (!interactive){
+                            outputJson(board, true);
+                        }
                     }
                 }
             }
@@ -93,5 +102,12 @@ public class Main {
             System.out.println("]");
             System.out.flush();
         }
+    }
+
+    private static void outputJson(final Board board, final boolean preComma) throws Exception {
+        if (preComma) {
+            System.out.print(",");
+        }
+        System.out.print(mapper.writeValueAsString(board));
     }
 }
