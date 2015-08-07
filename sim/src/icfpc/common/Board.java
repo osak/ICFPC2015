@@ -19,7 +19,7 @@ import java.util.Set;
 public class Board {
     private final int width;
     private final int height;
-    private final Set<Cell> filled;
+    private Set<Cell> filled;
     private Unit currentUnit;
     private Cell currentUnitPivot;
     private Angle currentAngle;
@@ -50,8 +50,8 @@ public class Board {
         List<Cell> cells = new ArrayList<>();
         if (unit != null) {
             for (final OriginalCell oc : unit.members) {
-                final Cell pivotDiff = angle.rotate(Cell.vector(unit.pivot.toCell(), pivot));
-                final Cell c = oc.toCell().plusVector(pivotDiff);
+                final Cell inner = angle.rotate(Cell.vector(unit.pivot.toCell(), oc.toCell()));
+                final Cell c = pivot.plusVector(inner);
                 cells.add(c);
             }
         }
@@ -77,6 +77,28 @@ public class Board {
 
     private void lock() {
         filled.addAll(getUnitCells());
+        final Set<Cell> newFilled = new HashSet<>();
+        int clearedRowCount = 0;
+        for (int y = height - 1; y >= 0; y--) {
+            boolean rowFilled = true;
+            for (int x = 0; x < width; x++) {
+                if (filled.contains(new OriginalCell(x, y).toCell())) {
+                    newFilled.add(new OriginalCell(x, y + clearedRowCount).toCell());
+                } else {
+                    rowFilled = false;
+                }
+            }
+            if (rowFilled) {
+                for (int x = 0; x < width; x++) {
+                    newFilled.remove(new OriginalCell(x, y + clearedRowCount).toCell());
+                }
+                clearedRowCount += 1;
+            }
+        }
+        if (clearedRowCount > 0) {
+            System.err.println("[DEBUG]" + clearedRowCount + " rows are cleared!");
+        }
+        filled = newFilled;
         currentUnit = null;
     }
 
@@ -142,9 +164,7 @@ public class Board {
         }
 
         if (currentUnit != null) {
-            for (final OriginalCell mem : currentUnit.members) {
-                final Cell pivotDiff = currentAngle.rotate(Cell.vector(currentUnit.pivot.toCell(), currentUnitPivot));
-                final Cell c = mem.toCell().plusVector(pivotDiff);
+            for (final Cell c : getUnitCells()) {
                 final OriginalCell oc = c.toOriginalCell();
                 f[oc.x][oc.y] = '*';
             }

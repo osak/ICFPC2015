@@ -41,18 +41,27 @@ public class Main {
             {
                 int unitId = randomizer.next(input.units.size());
                 boolean gameEnded = !board.spawn(input.units.get(unitId));
+                if (gameEnded) {
+                    System.err.println("[DEBUG]GAME ENDED");
+                    break;
+                } else {
+                    System.err.println("[DEBUG]SPAWN UNIT ID: " + unitId);
+                    board.debug();
+                }
             }
             System.out.print("[");
             for (int i = 0; i < output.solution.length(); i++) {
                 final Command cmd = Command.fromChar(output.solution.charAt(i));
+                //Scanner scanner = new Scanner(System.in);
+                //final Command cmd = Command.fromChar(scanner.nextLine().charAt(0));
+                boolean locked = !board.operate(cmd);
                 System.err.println("[DEBUG]command: " + cmd);
                 board.debug();
-                boolean locked = !board.operate(cmd);
-                //mapper.writeValue(System.out, board);
                 if (i > 0) {
-                    System.out.println(",");
+                    System.out.print(",");
                 }
                 System.out.print(mapper.writeValueAsString(board));
+                board.debug();
                 if (locked) {
                     int unitId = randomizer.next(input.units.size());
                     boolean gameEnded = !board.spawn(input.units.get(unitId));
@@ -65,7 +74,8 @@ public class Main {
                     }
                 }
             }
-            System.out.print("]");
+            System.out.println("]");
+            System.out.flush();
             break;
         }
     }

@@ -5,10 +5,10 @@ package icfpc.common;
  */
 public enum Angle {
     CLOCK_0(2, 0, -1, 1),
-    CLOCK_60(1, -1, -2, 0),
+    CLOCK_60(1, 1, -2, 0),
     CLOCK_120(-1, 1, -1, -1),
     CLOCK_180(-2, 0, 1, -1),
-    CLOCK_240(-1, 1, 2, 0),
+    CLOCK_240(-1, -1, 2, 0),
     CLOCK_300(1, -1, 1, 1);
 
     private int ax;
