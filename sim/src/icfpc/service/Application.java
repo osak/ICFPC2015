@@ -36,7 +36,15 @@ public class Application implements HttpHandler {
             responseBody.write(content.getBytes());
             responseBody.close();
         } catch(Exception e) {
-            throw e;
+            final Headers responseHeaders = httpExchange.getResponseHeaders();
+            responseHeaders.add("content-type", "text/html");
+
+            final String content = "ERROR: " + e.toString();
+            httpExchange.sendResponseHeaders(200, content.length());
+
+            final OutputStream responseBody = httpExchange.getResponseBody();
+            responseBody.write(content.getBytes());
+            responseBody.close();
         }
     }
 
