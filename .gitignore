@@ -114,4 +114,5 @@ target/
 
 # Output
 output
+visdump
 solution.exe
