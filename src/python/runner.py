@@ -20,7 +20,7 @@ def create_single_output(config, seed ,command):
 
 def run(exe_path, config, seed):
     input_string = translate_single(config, seed)
-    proc = subprocess.Popen([exe_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    proc = subprocess.Popen([exe_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     command, stderr = proc.communicate(input_string)
     return create_single_output(config, seed, command)
 
