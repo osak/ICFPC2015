@@ -52,14 +52,15 @@
     function drawBoard(board) {
         var boardWidth = board.width * HEX_WIDTH + HEX_SIZE*3;
         var boardHeight = board.height * HEX_WIDTH + HEX_SIZE*3;
-        if($('#scale').attr('checked')) {
+        if($('#scale').prop('checked')) {
             canvas.width = CANVAS_ORIGINAL_DIM.width;
             canvas.height = CANVAS_ORIGINAL_DIM.height;
-            ctx.scale(Math.min(1, Math.min(canvas.width / boardWidth, canvas.height / boardHeight)));
+            var scale = Math.min(1, Math.min(canvas.width / boardWidth, canvas.height / boardHeight)) ;
+            ctx.scale(scale, scale);
         } else {
             canvas.width = boardWidth;
             canvas.height = boardHeight;
-            ctx.scale(1);
+            ctx.scale(1, 1);
         }
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         for(var r = 0; r < board.height; ++r) {
