@@ -91,11 +91,13 @@
             var drawPos = getDrawPosition(e);
             drawFullCell(drawPos.x, drawPos.y);
         });
-        board.unitCells.forEach(function(e) {
-            var drawPos = getDrawPosition(e);
-            drawUnitCell(drawPos.x, drawPos.y);
-        });
-        {
+        if(board.unitCells) {
+            board.unitCells.forEach(function(e) {
+                var drawPos = getDrawPosition(e);
+                drawUnitCell(drawPos.x, drawPos.y);
+            });
+        }
+        if(board.pivot) {
             var drawPos = getDrawPosition(board.pivot);
             drawPivot(drawPos.x, drawPos.y);
         }
@@ -114,17 +116,34 @@
                 url: '/sakimori/problems/problem_' + id + '.json',
                 contentType: 'text/json'
             }).done(function(obj) {
-                drawBoard({
+                init = {
                     height: obj.height,
                     width: obj.width,
                     fullCells: obj.filled
+                };
+                history = [];
+                history.push(init);
+                obj.units.forEach(function(e) {
+                    var width = 0, height = 0;
+                    e.members.forEach(function(m) {
+                        width = Math.max(width, m.x+1);
+                        height = Math.max(height, m.y+1);
+                    });
+                    history.push({
+                        width: width,
+                        height: height,
+                        fullCells: e.members,
+                        pivot: e.pivot
+                    });
                 });
+                $('#max').text(history.length - 1);
+                setBoardIndex(0);
             });
         });
     }
 
     function setBoardIndex(index) {
-        if(index < 0 || index > history.length) {
+        if(index < 0 || index >= history.length) {
             return false;
         }
         boardIndex = index;
@@ -140,6 +159,7 @@
         $('#simulator').click(function() {
             var raw = $('#simulator-out').val();
             eval('history = ' + raw);
+            $('#max').text(history.length - 1);
             setBoardIndex(0);
         });
 
