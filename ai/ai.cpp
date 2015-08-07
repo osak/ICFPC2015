@@ -1,3 +1,6 @@
+﻿#define _CRT_SECURE_NO_WARNINGS
+
+
 #include <cstdio>
 #include <vector>
 #include <string>
@@ -160,9 +163,19 @@ void update(Board &board, Point &pivot, int theta, int num) {
     board.previousLine = count;
 }
 
+void inputFromFile(string s){
+	freopen(s.c_str(), "r", stdin);
+}
+void outputToFile(string s){
+	freopen(s.c_str(), "w", stdout);
+}
+
 int main()
 {
-    int unitCount, fieldCount, sourceLength, maxScore = -1, i, j, k;
+	//inputFromFile("../cpp_input/problem_0_0.txt");
+	//outputToFile("out.txt");
+
+	int unitCount, fieldCount, sourceLength, maxScore = -1, i, j, k;
     string ans = "";
     Board initBoard;
     priority_queue <Board> que, queNext;
