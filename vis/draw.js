@@ -5,6 +5,7 @@
     var HEX_WIDTH = HEX_SIZE * Math.sqrt(3);
     var HEX_HEIGHT = HEX_SIZE * 1.5;
     var ORIGIN = {x: 20, y: 20};
+    var CANVAS_ORIGINAL_DIM = {width: 800, height: 500};
 
     function setLineColor(color) {
         ctx.strokeStyle = color;
@@ -49,8 +50,18 @@
     }
 
     function drawBoard(board) {
-        canvas.width = board.width * HEX_WIDTH + HEX_SIZE*3;
-        canvas.height = board.height * HEX_HEIGHT + HEX_SIZE*3;
+        var boardWidth = board.width * HEX_WIDTH + HEX_SIZE*3;
+        var boardHeight = board.height * HEX_WIDTH + HEX_SIZE*3;
+        if($('#scale').prop('checked')) {
+            canvas.width = CANVAS_ORIGINAL_DIM.width;
+            canvas.height = CANVAS_ORIGINAL_DIM.height;
+            var scale = Math.min(1, Math.min(canvas.width / boardWidth, canvas.height / boardHeight)) ;
+            ctx.scale(scale, scale);
+        } else {
+            canvas.width = boardWidth;
+            canvas.height = boardHeight;
+            ctx.scale(1, 1);
+        }
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         for(var r = 0; r < board.height; ++r) {
             for(var c = 0; c < board.width; ++c) {
