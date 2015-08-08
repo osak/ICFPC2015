@@ -8,6 +8,7 @@ import icfpc.cli.CommandLineOption;
 import icfpc.common.Board;
 import icfpc.common.Cell;
 import icfpc.common.Command;
+import icfpc.common.GameSettings;
 import icfpc.common.OriginalCell;
 import icfpc.io.Answer;
 import icfpc.io.CommandReader;
@@ -48,10 +49,11 @@ public class Main {
         }
 
         final Problem problem = mapper.readValue(opts.getProblemFile(), Problem.class);
+        final GameSettings gameSettings = new GameSettings(problem.width, problem.height, problem.units, problem.sourceLength);
 
         final SimulatorResultWriter simulatorResultWriter;
         if (opts.isNormalMode()) {
-            simulatorResultWriter = new DefaultSimulatorResultWriter(System.out);
+            simulatorResultWriter = new DefaultSimulatorResultWriter(System.out, gameSettings);
         } else {
             simulatorResultWriter = new MockSimulatorResultWriter();
         }
@@ -66,7 +68,7 @@ public class Main {
         }
 
         final Randomizer randomizer = new Randomizer(problem.sourceSeeds.get(0));
-        final Board board = new Board(problem.width, problem.height, problem.units, randomizer, problem.sourceLength, FluentIterable.from(problem.filled).transform(new Function<OriginalCell, Cell>() {
+        final Board board = new Board(gameSettings, randomizer, FluentIterable.from(problem.filled).transform(new Function<OriginalCell, Cell>() {
             @Nullable
             @Override
             public Cell apply(OriginalCell input) {
