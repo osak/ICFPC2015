@@ -21,4 +21,8 @@ public class Randomizer {
     public int next(int n) {
         return next() % n;
     }
+
+    public int getSeed() {
+        return val;
+    }
 }

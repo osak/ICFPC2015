@@ -4,19 +4,26 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
+import icfpc.cli.CommandLineOption;
 import icfpc.common.Board;
 import icfpc.common.Cell;
 import icfpc.common.Command;
 import icfpc.common.OriginalCell;
-import icfpc.io.Input;
-import icfpc.io.Output;
+import icfpc.io.Answer;
+import icfpc.io.CommandReader;
+import icfpc.io.DefaultSimulatorResultWriter;
+import icfpc.io.MockSimulatorResultWriter;
+import icfpc.io.Problem;
+import icfpc.io.SimulatorResultWriter;
+import icfpc.io.StdInCommandReader;
 import icfpc.random.Randomizer;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 
 import javax.annotation.Nullable;
-import java.io.File;
-import java.net.URL;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * @author masata
@@ -25,89 +32,67 @@ public class Main {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     public static void main(final String[] args) throws Exception {
-        final ClassLoader classLoader = Main.class.getClassLoader();
-        final TypeFactory typeFactory = TypeFactory.defaultInstance();
-        URL inputFile = classLoader.getResource("problems/problem_0.json");
-        URL outputFile = classLoader.getResource("example_output/problem_0.json/output_0.json");
-        boolean interactive = false;
-        if (args.length > 0 && args[0].equals("-i")) {
-            interactive = true;
-        } else if (args.length > 1) {
-            System.err.println("inputFile: " + inputFile);
-            inputFile = new File(args[0]).toURI().toURL();
-            outputFile = new File(args[1]).toURI().toURL();
+        setLogger();
+        final CommandLineOption opts;
+        try {
+            opts = CommandLineOption.parse(args);
+        } catch (final Throwable t) {
+            CommandLineOption.printHelp();
+            return;
         }
-        final Input input = mapper.readValue(inputFile, Input.class);
-        final List<Output> outputs = mapper.readValue(outputFile, typeFactory.constructCollectionType(List.class, Output.class));
 
-        for (final Output output : outputs) {
-            if (!interactive) {
-                System.out.print("[");
-            }
-            final Board board = new Board(input.width, input.height, FluentIterable.from(input.filled).transform(new Function<OriginalCell, Cell>() {
-                @Nullable
-                @Override
-                public Cell apply(OriginalCell input) {
-                    return input.toCell();
-                }
-            }).toImmutableList());
-            board.debug();
-            final Randomizer randomizer = new Randomizer(input.sourceSeeds.get(0));
-            {
-                int unitId = randomizer.next(input.units.size());
-                boolean gameEnded = !board.spawn(input.units.get(unitId));
-                if (gameEnded) {
-                    System.err.println("[DEBUG]GAME ENDED");
-                    break;
-                } else {
-                    System.err.println("[DEBUG]SPAWN UNIT ID: " + unitId);
-                    board.debug();
-                    if (!interactive){
-                        outputJson(board, false);
-                    }
-                }
-            }
-            for (int i = 0; i < output.solution.length(); i++) {
-                final Command cmd;
-                if (interactive) {
-                    Scanner scanner = new Scanner(System.in);
-                    cmd = Command.fromChar(scanner.nextLine().charAt(0));
-                } else {
-                    cmd = Command.fromChar(output.solution.charAt(i));
-                }
-                boolean locked = !board.operate(cmd);
-                System.err.println("[DEBUG]command: " + cmd);
-                board.debug();
-                if (!interactive) {
-                    outputJson(board, true);
-                }
-                if (locked) {
-                    int unitId = randomizer.next(input.units.size());
-                    boolean gameEnded = !board.spawn(input.units.get(unitId));
-                    if (gameEnded) {
-                        System.err.println("[DEBUG]GAME ENDED");
-                        break;
-                    } else {
-                        System.err.println("[DEBUG]SPAWN UNIT ID: " + unitId);
-                        board.debug();
-                        if (!interactive){
-                            outputJson(board, true);
-                        }
-                    }
-                }
-            }
-            break;
+        if (opts.isDebugMode()) {
+            Logger.getRootLogger().setLevel(Level.DEBUG);
+        } else {
+            Logger.getRootLogger().setLevel(Level.INFO);
         }
-        if (!interactive) {
-            System.out.println("]");
-            System.out.flush();
+
+        final Problem problem = mapper.readValue(opts.getProblemFile(), Problem.class);
+
+        final SimulatorResultWriter simulatorResultWriter;
+        if (opts.isNormalMode()) {
+            simulatorResultWriter = new DefaultSimulatorResultWriter(System.out);
+        } else {
+            simulatorResultWriter = new MockSimulatorResultWriter();
         }
+
+        final CommandReader commandReader;
+        if (opts.isNormalMode()) {
+            final TypeFactory typeFactory = TypeFactory.defaultInstance();
+            final List<Answer> answers = mapper.readValue(opts.getAnswerFile(), typeFactory.constructCollectionType(List.class, Answer.class));
+            commandReader = answers.get(0).getCommandReader();
+        } else {
+            commandReader = new StdInCommandReader();
+        }
+
+        final Randomizer randomizer = new Randomizer(problem.sourceSeeds.get(0));
+        final Board board = new Board(problem.width, problem.height, problem.units, randomizer, problem.sourceLength, FluentIterable.from(problem.filled).transform(new Function<OriginalCell, Cell>() {
+            @Nullable
+            @Override
+            public Cell apply(OriginalCell input) {
+                return input.toCell();
+            }
+        }).toImmutableList());
+        simulatorResultWriter.write(board);
+        while (commandReader.hasNext()) {
+            final Command cmd = commandReader.next();
+            board.operate(cmd);
+            simulatorResultWriter.write(board);
+            if (board.hasEnded()) {
+                break;
+            }
+        }
+        simulatorResultWriter.close();
     }
 
-    private static void outputJson(final Board board, final boolean preComma) throws Exception {
-        if (preComma) {
-            System.out.print(",");
-        }
-        System.out.print(mapper.writeValueAsString(board));
+    private static void setLogger() {
+        final PatternLayout layout = new PatternLayout();
+        layout.setConversionPattern("%d %5p %c{1} - %m%n");
+        final ConsoleAppender appender = new ConsoleAppender();
+        appender.setLayout(layout);
+        appender.setTarget("System.err");
+        appender.setName("stderr");
+        appender.activateOptions();
+        Logger.getRootLogger().addAppender(appender);
     }
 }
