@@ -166,19 +166,21 @@
         $('#canvas').keypress(function(e) {
             var command = COMMAND_TABLE[e.charCode];
             var board = history[boardIndex];
-            $.ajax({
-                url: 'http://icfpc.osak.jp/miichan',
-                contentType: 'application/json',
-                method: 'POST',
-                data: JSON.stringify({
-                    command: command,
-                    board: board
-                })
-            }).done(function(res) {
-                console.log(res);
-                history[boardIndex] = res.Board;
-                drawBoard(history[boardIndex]);
-            });
+            if(command) {
+                $.ajax({
+                    url: 'http://icfpc.osak.jp/miichan',
+                    contentType: 'application/json',
+                    method: 'POST',
+                    data: JSON.stringify({
+                        command: command,
+                        board: board
+                    })
+                }).done(function(res) {
+                    console.log(res);
+                    history[boardIndex] = res.Board;
+                    drawBoard(history[boardIndex]);
+                });
+            }
         });
     }
 
