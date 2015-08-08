@@ -13,7 +13,9 @@ public enum Command {
     MOVE_SW,
     MOVE_SE,
     CLOCK,
-    C_CLOCK;
+    C_CLOCK,
+    NOOP,
+    INVALID;
 
     private static final Map<Character, Command> COMMAND_MAP = ImmutableMap.<Character, Command>builder()
             .put('p', MOVE_W)
@@ -58,9 +60,17 @@ public enum Command {
             .put('w', C_CLOCK)
             .put('x', C_CLOCK)
 
+            .put('\t', NOOP)
+            .put('\n', NOOP)
+            .put('\r', NOOP)
+
             .build();
 
     public static Command fromChar(char c) {
-        return COMMAND_MAP.get(c);
+        if (COMMAND_MAP.containsKey(c)) {
+            return COMMAND_MAP.get(c);
+        } else {
+            return INVALID;
+        }
     }
 }
