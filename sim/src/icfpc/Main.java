@@ -88,6 +88,7 @@ public class Main {
                 final Command cmd = commandReader.next();
                 if (board.hasEnded()) {
                     board.violateRule();
+                    board.memo = "余分な命令";
                     if (i == 0) {
                         simulatorResultWriter.write(board);
                     }
@@ -110,6 +111,7 @@ public class Main {
             if (board.getSpawnedUnitCount() == problem.sourceLength) {
                 alive++;
             }
+            simulatorResultWriter.write("memo", board.memo);
         }
         simulatorResultWriter.write("averageScore", sumScore / n);
         simulatorResultWriter.write("aliveCount", alive);

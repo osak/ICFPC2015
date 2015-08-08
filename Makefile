@@ -43,3 +43,5 @@ gachi-source.tar.gz:
 
 clean:
 	rm -rf solution.exe output visdump aidebug gachi-source.tar.gz
+
+.PRECIOUS: output/%

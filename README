@@ -1,3 +1,9 @@
 Team Gachi's ICFPC 2015 submission
 
 This project is a solution for ICFPC 2015 task.
+
+We would like to strongly recommend judges to see how our AI is doing well by
+following:
+  * Change `beamWidth` parameter in ai.cpp:13 to 2000.
+  * Compile it.
+  * Run on problem 23 and see how he does.

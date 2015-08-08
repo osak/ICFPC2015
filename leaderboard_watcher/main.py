@@ -25,6 +25,11 @@ def update():
             power = submission['power_score']
             score = submission['score']
             tag = submission['tags'][0]
+            try:
+                int_tag = int(submission['tags'][0])
+                tag = int_tag
+            except:
+                pass
             postdata = {'problem_id': setting_id, 'power': power, 'score': score}
             postid = {'_id': tag}
             if leaderboard.find_one(postid):
