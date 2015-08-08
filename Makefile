@@ -17,6 +17,12 @@ solution: solution.exe
 	mkdir -p aidebug
 	python src/python/runner.py ./solution.exe problems output
 
+visdump/%: output/%
+	sim/run.py problems/$* output/$* > visdump/$* 2> /dev/null
+
+output/%: solution.exe
+	./play_icfp2015 -f problems/$* > output/$*
+
 CPP_SOURCE = ai/ai.cpp
 solution.exe: $(CPP_SOURCE)
 	c++ -std=c++11 -O3 -o $@ $<
