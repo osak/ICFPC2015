@@ -327,7 +327,10 @@ public class Board {
             gen.writeNumberField("moveScore", value.moveScore);
             gen.writeNumberField("powerScore", value.powerScore);
             gen.writeNumberField("clearedRows", value.prevClearedRows);
-            gen.writeObjectField("settings", value.gameSettings);
+            gen.writeNumberField("width", value.gameSettings.width);
+            gen.writeNumberField("height", value.gameSettings.height);
+            gen.writeNumberField("maxSources", value.gameSettings.maxSources);
+            gen.writeObjectField("units", value.gameSettings.units);
             gen.writeEndObject();
         }
     }
