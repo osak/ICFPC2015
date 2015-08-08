@@ -60,9 +60,10 @@ public class Board {
         this.prevClearedRows = 0;
         this.moveScore = 0;
         this.powerScore = 0;
-        this.isNewUnit = true;
         this.moveHistory = Sets.newHashSet();
         spawn();
+        historyCheck();
+        this.isNewUnit = false;
     }
 
     public boolean hasEnded() {
@@ -196,11 +197,6 @@ public class Board {
             isNewUnit = false;
         }
 
-        if (!historyCheck()) {
-            // ここは異常終了
-            return false;
-        }
-
         Cell newUnitPivot = new Cell(currentUnitPivot.x, currentUnitPivot.y);
         Angle newAngle = currentAngle;
         switch (command) {
@@ -240,15 +236,17 @@ public class Board {
         currentUnitPivot = newUnitPivot;
         currentAngle = newAngle;
         debug();
+
+        if (!historyCheck()) {
+            violateRule();
+            return false;
+        }
+
         return true;
     }
 
     private boolean historyCheck() {
-        Set<Cell> cells = Sets.newHashSet();
-
-        for (OriginalCell originalCell : currentUnit.members) {
-            cells.add(currentUnitPivot.plusVector(Cell.vector(currentUnit.pivot.toCell(), originalCell.toCell())));
-        }
+        Set<Cell> cells = Sets.newHashSet(getUnitCells());
         if (moveHistory.contains(cells)) {
             return false;
         }
