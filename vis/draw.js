@@ -102,6 +102,7 @@
             var drawPos = getDrawPosition(board.pivot);
             drawPivot(drawPos.x, drawPos.y);
         }
+        $('#score').text(board.score);
     }
 
     function initProblemSelector() {
