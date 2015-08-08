@@ -3,6 +3,7 @@ import subprocess
 import os
 import json
 from translate import translate_single
+import time
 
 aidebug_dir = None
 
@@ -12,22 +13,25 @@ def get_path(input_path, problem_id):
     return os.path.join(input_path, file_name)
 
 
-def create_single_output(config, seed ,command):
+def create_single_output(config, seed, command, elapsed_time):
     return {
         'problemId': config['id'],
         'seed': seed,
-        'solution': command
+        'solution': command,
+        'elapsedTime': elapsed_time
     }
 
 
 def run(exe_path, config, seed):
+    start_time = time.time()
     input_string = translate_single(config, seed)
     proc = subprocess.Popen([exe_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     command, stderr = proc.communicate(input_string)
     if aidebug_dir:
         with open(get_path(aidebug_dir, config['id']) + '.{}.txt'.format(seed), 'w') as writer:
             writer.write(stderr)
-    return create_single_output(config, seed, command)
+    elapsed_time = time.time() - start_time
+    return create_single_output(config, seed, command, elapsed_time)
 
 
 def solve(exe_path, input_path, output_path, problem_id):

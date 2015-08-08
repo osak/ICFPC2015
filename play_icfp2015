@@ -26,7 +26,6 @@ def main():
             queries.append(('./solution.exe', config, seed))
 
     result = pool.map(mapper, queries)
-    print result
     print json.dumps(result)
 
 
