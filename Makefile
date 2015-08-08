@@ -27,7 +27,7 @@ output/%: solution.exe
 
 CPP_SOURCE = ai/ai.cpp
 solution.exe: $(CPP_SOURCE)
-	c++ -std=c++11 -O3 -o $@ $<
+	c++ -std=c++11 -O3 -o $@ $^
 
 solver-source: gachi-source.tar.gz
 
