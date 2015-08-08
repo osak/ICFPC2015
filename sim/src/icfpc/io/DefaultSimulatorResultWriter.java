@@ -6,6 +6,8 @@ import icfpc.common.GameSettings;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author masata
@@ -15,6 +17,7 @@ public class DefaultSimulatorResultWriter implements SimulatorResultWriter {
 
     private final OutputStream outputStream;
     private boolean firstElement;
+    private Map<String, Object> appendix = new HashMap<>();
 
     public DefaultSimulatorResultWriter(final OutputStream outputStream, final GameSettings gameSettings) throws IOException {
         this.outputStream = outputStream;
@@ -33,8 +36,17 @@ public class DefaultSimulatorResultWriter implements SimulatorResultWriter {
     }
 
     @Override
+    public void write(String fieldName, Object object) throws IOException {
+        appendix.put(fieldName, object);
+    }
+
+    @Override
     public void close() throws IOException {
-        outputStream.write("]}".getBytes());
+        outputStream.write("]".getBytes());
+        for (final Map.Entry<String, Object> entry : appendix.entrySet()) {
+            outputStream.write(String.format("\n, \"%s\": %s", entry.getKey(), mapper.writeValueAsString(entry.getValue())).getBytes());
+        }
+        outputStream.write("}".getBytes());
         outputStream.close();
     }
 }
