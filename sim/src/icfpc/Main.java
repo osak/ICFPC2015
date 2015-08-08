@@ -63,6 +63,7 @@ public class Main {
             final TypeFactory typeFactory = TypeFactory.defaultInstance();
             final List<Answer> answers = mapper.readValue(opts.getAnswerFile(), typeFactory.constructCollectionType(List.class, Answer.class));
             commandReader = answers.get(0).getCommandReader();
+            simulatorResultWriter.write("expectedScore", answers.get(0).expectedScore);
         } else {
             commandReader = new StdInCommandReader();
         }
@@ -90,6 +91,9 @@ public class Main {
                 break;
             }
         }
+        simulatorResultWriter.write("finalScore", board.getScore());
+        simulatorResultWriter.write("spawnCount", board.getSpawnedUnitCount());
+        simulatorResultWriter.write("maxSources", problem.sourceLength);
         simulatorResultWriter.close();
     }
 
