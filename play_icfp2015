@@ -2,6 +2,11 @@
 from argparse import ArgumentParser
 import json
 from src.python.runner import run
+from multiprocessing import Pool
+
+
+def mapper(args):
+    return run(*args)
 
 
 def main():
@@ -13,11 +18,15 @@ def main():
     parser.add_argument('-p', metavar='phrase', nargs='*', type=str)
     args = parser.parse_args()
 
-    result = []
+    pool = Pool(args.c)
+    queries = []
     for conffile in args.f:
         config = json.load(conffile)
         for seed in config['sourceSeeds']:
-            result.append(run('./solution.exe', config, seed))
+            queries.append(('./solution.exe', config, seed))
+
+    result = pool.map(mapper, queries)
+    print result
     print json.dumps(result)
 
 
