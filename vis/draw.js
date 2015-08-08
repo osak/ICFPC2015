@@ -151,6 +151,38 @@
         drawBoard(history[boardIndex]);
     }
 
+    var COMMAND_TABLE = {
+        104: 'MOVE_W',
+        106: 'MOVE_SW',
+        107: 'MOVE_SE',
+        108: 'MOVE_E'
+    };
+
+    function initGame() {
+        console.log('hoge');
+        $('#canvas').keypress(function(e) {
+            console.log(e);
+            var command = COMMAND_TABLE[e.keyCode];
+            var board = history[boardIndex];
+            $.ajax({
+                url: 'http://icfpc.osak.jp:4685/miichan',
+                contentType: 'application/json',
+                method: 'POST',
+                data: {
+                    command: command,
+                    board: board
+                }
+            }).done(function(res) {
+                console.log(res);
+                if(result.Result) {
+                    history[boardIndex] = result.Board;
+                } else {
+                    alert('Invalid move');
+                }
+            });
+        });
+    }
+
     $(document).ready(function() {
         canvas = $('#canvas').get(0);
         ctx = canvas.getContext('2d');
@@ -179,5 +211,6 @@
         });
 
         initProblemSelector();
+        initGame();
     });
 })();
