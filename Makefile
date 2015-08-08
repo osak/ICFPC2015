@@ -6,6 +6,7 @@ visdump-all: solution-all
 
 submit-all: solution.exe
 	./play_icfp2015 -f problems/* | ./submit.py
+	mv problem_14.json problems/
 
 solution-with-debug: solution.exe
 	mkdir -p output
@@ -16,6 +17,10 @@ solution-all: solution.exe
 	mkdir -p output
 	mkdir -p aidebug
 	python src/python/runner.py ./solution.exe problems output
+
+submit/%: visdump/% output/%
+	python src/python/summary.py visdump/$*
+	cat visdump/$* | pbcopy
 
 summary/%: visdump/%
 	python src/python/summary.py $<
