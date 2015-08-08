@@ -1,29 +1,3 @@
 Team Gachi's ICFPC 2015 submission
 
 This project is a solution for ICFPC 2015 task.
-This package should contain following files.
-
-+- Makefile
-+- src
-|  +- python
-|     +- runner.py
-|     +- translate.py
-+- ai
-   +- ai.cpp
-
-
-Follow the steps below to obtain output json.
-
-(0. extract tar file)
-$ tar xzf gachi-source.tar.gz
-
-1. Place problem config json under the `problems` directory.
-$ mkdir problems
-$ cd problems
-$ wget http://icfpcontest.org/problems/problem_0.json
-...
-
-2. Build solution and run it!
-$ cd ..
-$ make solution
-

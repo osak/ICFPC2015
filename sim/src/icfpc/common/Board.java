@@ -224,6 +224,11 @@ public class Board {
             case C_CLOCK:
                 newAngle = newAngle.counterClock();
                 break;
+            case NOOP:
+                return true;
+            case INVALID:
+                violateRule();
+                return false;
             default:
                 throw new Error("WOW");
         }
