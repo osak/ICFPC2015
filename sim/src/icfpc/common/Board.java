@@ -36,6 +36,8 @@ public class Board {
     private static final Logger LOGGER = Logger.getLogger(Board.class);
     private final GameSettings gameSettings;
 
+    private Set<Spell> castedSpells = new HashSet<>();
+    private List<Character> allCommands = new ArrayList<>();
     private Set<Cell> filled;
     private Unit currentUnit;
     private Cell currentUnitPivot;
@@ -161,7 +163,7 @@ public class Board {
             }
         }
         if (clearedRowCount > 0) {
-            System.err.println("[DEBUG]" + clearedRowCount + " rows are cleared!");
+            //System.err.println("[DEBUG]" + clearedRowCount + " rows are cleared!");
         }
 
         accMoveScore(currentUnit.members.size(), clearedRowCount);
@@ -191,7 +193,35 @@ public class Board {
      * @param command cmd
      * @return false if locked
      */
-    public boolean operate(final Command command) {
+    public boolean operate(final char command) {
+        allCommands.add(command);
+        for (Spell spell : Spell.values()) {
+            if (allCommands.size() >= spell.phrase.length()) {
+                boolean casted = true;
+                for (int i = 0; i < spell.phrase.length(); i++) {
+                    final int iAllCommands = allCommands.size() - spell.phrase.length() + i;
+                    if (allCommands.get(iAllCommands) != spell.phrase.charAt(i)) {
+                        casted = false;
+                        break;
+                    }
+                }
+                if (casted) {
+                    if (!castedSpells.contains(spell)) {
+                        castedSpells.add(spell);
+                        powerScore += 300;
+                    }
+                    LOGGER.info("CASTED: " + spell.phrase);
+                    powerScore += 2 * spell.phrase.length();
+                }
+            }
+        }
+        // TODO Phraseの詳細
+        // invalidでもいい？
+        // ゲームが終了してもいい？
+        return operate(Command.fromChar(command));
+    }
+
+    private boolean operate(final Command command) {
         if (!gameInProgress) {
             LOGGER.warn("Game has ended.");
             return false;

@@ -1,7 +1,6 @@
 package icfpc.io;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import icfpc.common.Command;
 
 /**
  * @author masata
@@ -27,8 +26,8 @@ public class Answer {
         }
 
         @Override
-        public Command next() {
-            final Command ret = Command.fromChar(solution.charAt(ix));
+        public char next() {
+            final char ret = solution.charAt(ix);
             ix++;
             return ret;
         }

@@ -6,7 +6,6 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import icfpc.common.Command;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -24,7 +23,7 @@ public class Application implements HttpHandler {
     public void handle(final HttpExchange httpExchange) throws IOException {
         try {
             final State state = OBJECT_MAPPER.readValue(httpExchange.getRequestBody(), State.class);
-            final boolean result = state.board.operate(Command.valueOf(state.command));
+            final boolean result = state.board.operate('a'); // BUG
             final Headers responseHeaders = httpExchange.getResponseHeaders();
             responseHeaders.add("content-type", "application/json");
 

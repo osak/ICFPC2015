@@ -7,7 +7,6 @@ import com.google.common.collect.FluentIterable;
 import icfpc.cli.CommandLineOption;
 import icfpc.common.Board;
 import icfpc.common.Cell;
-import icfpc.common.Command;
 import icfpc.common.GameSettings;
 import icfpc.common.OriginalCell;
 import icfpc.io.Answer;
@@ -85,7 +84,7 @@ public class Main {
                 simulatorResultWriter.write(board);
             }
             while (commandReader.hasNext()) {
-                final Command cmd = commandReader.next();
+                final char cmd = commandReader.next();
                 if (board.hasEnded()) {
                     board.violateRule();
                     board.memo = "余分な命令";
