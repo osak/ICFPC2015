@@ -58,38 +58,63 @@ public class Main {
             simulatorResultWriter = new MockSimulatorResultWriter();
         }
 
-        final CommandReader commandReader;
-        if (opts.isNormalMode()) {
-            final TypeFactory typeFactory = TypeFactory.defaultInstance();
-            final List<Answer> answers = mapper.readValue(opts.getAnswerFile(), typeFactory.constructCollectionType(List.class, Answer.class));
-            commandReader = answers.get(0).getCommandReader();
-        } else {
-            commandReader = new StdInCommandReader();
-        }
-
-        final Randomizer randomizer = new Randomizer(problem.sourceSeeds.get(0));
-        final Board board = new Board(gameSettings, randomizer, FluentIterable.from(problem.filled).transform(new Function<OriginalCell, Cell>() {
-            @Nullable
-            @Override
-            public Cell apply(OriginalCell input) {
-                return input.toCell();
+        final int n = problem.sourceSeeds.size();
+        int sumScore = 0;
+        int sumSpawn = 0;
+        int alive = 0;
+        for (int i = 0; i < n; i++) {
+            final CommandReader commandReader;
+            if (opts.isNormalMode()) {
+                final TypeFactory typeFactory = TypeFactory.defaultInstance();
+                final List<Answer> answers = mapper.readValue(opts.getAnswerFile(), typeFactory.constructCollectionType(List.class, Answer.class));
+                commandReader = answers.get(i).getCommandReader();
+                simulatorResultWriter.write("expectedScore", answers.get(i).expectedScore);
+            } else {
+                commandReader = new StdInCommandReader();
             }
-        }).toImmutableList());
-        simulatorResultWriter.write(board);
-        while (commandReader.hasNext()) {
-            final Command cmd = commandReader.next();
-            if (board.hasEnded()) {
-                board.violateRule();
+
+            final Randomizer randomizer = new Randomizer(problem.sourceSeeds.get(i));
+            final Board board = new Board(gameSettings, randomizer, FluentIterable.from(problem.filled).transform(new Function<OriginalCell, Cell>() {
+                @Nullable
+                @Override
+                public Cell apply(OriginalCell input) {
+                    return input.toCell();
+                }
+            }).toImmutableList());
+            if (i == 0) {
                 simulatorResultWriter.write(board);
-                break;
             }
-            board.operate(cmd);
-            simulatorResultWriter.write(board);
+            while (commandReader.hasNext()) {
+                final Command cmd = commandReader.next();
+                if (board.hasEnded()) {
+                    board.violateRule();
+                    if (i == 0) {
+                        simulatorResultWriter.write(board);
+                    }
+                    break;
+                }
+                board.operate(cmd);
+                if (i == 0) {
+                    simulatorResultWriter.write(board);
+                }
 
-            if (board.hasEnded()) {
-                break;
+                if (board.hasEnded()) {
+                    break;
+                }
+            }
+            sumScore += board.getScore();
+            sumSpawn += board.getSpawnedUnitCount();
+            if (i == 0) {
+                simulatorResultWriter.write("SampleScore", board.getScore());
+            }
+            if (board.getSpawnedUnitCount() == problem.sourceLength) {
+                alive++;
             }
         }
+        simulatorResultWriter.write("averageScore", sumScore / n);
+        simulatorResultWriter.write("aliveCount", alive);
+        simulatorResultWriter.write("aliveRate", (double)sumSpawn / (n * problem.sourceLength));
+        simulatorResultWriter.write("testCaseCount", n);
         simulatorResultWriter.close();
     }
 

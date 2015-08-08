@@ -68,6 +68,10 @@ public class Board {
         return !gameInProgress;
     }
 
+    public int getSpawnedUnitCount() {
+        return spawnedUnitCount;
+    }
+
     public void violateRule() {
         gameInProgress = false;
         moveScore = 0;
@@ -82,11 +86,13 @@ public class Board {
             gameInProgress = false;
             LOGGER.debug("ゲームは終了しました。");
             debug();
+            return;
         }
         if (!check(unit, pivot, Angle.CLOCK_0)) {
             gameInProgress = false;
             LOGGER.debug("ゲームは終了しました。");
             debug();
+            return;
         }
         currentUnit = unit;
         currentUnitPivot = pivot;

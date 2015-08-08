@@ -10,4 +10,5 @@ import java.io.IOException;
  */
 public interface SimulatorResultWriter extends Closeable {
     void write(final Board board) throws IOException;
+    void write(final String fieldName, final Object object) throws IOException;
 }
