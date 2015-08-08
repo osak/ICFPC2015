@@ -3,6 +3,7 @@
     var ctx;
     var history;
     var boardIndex;
+    var timer;
     var HEX_SIZE = 20;
     var HEX_WIDTH = HEX_SIZE * Math.sqrt(3);
     var HEX_HEIGHT = HEX_SIZE * 1.5;
@@ -149,17 +150,19 @@
         boardIndex = index;
         $('#current-state').val(index);
         drawBoard(history[boardIndex]);
+        return true;
     }
 
     var COMMAND_TABLE = {
-        104: 'MOVE_W',
-        106: 'MOVE_SW',
-        107: 'MOVE_SE',
-        108: 'MOVE_E'
+        106: 'MOVE_W',
+        107: 'MOVE_E',
+        110: 'MOVE_SW',
+        44:  'MOVE_SE',
+        117: 'C_CLOCK',
+        105: 'CLOCK'
     };
 
     function initGame() {
-        console.log('hoge');
         $('#canvas').keypress(function(e) {
             var command = COMMAND_TABLE[e.charCode];
             var board = history[boardIndex];
@@ -203,6 +206,25 @@
         $('#current-state').keypress(function(e) {
             if(e.keyCode == 13) {
                 setBoardIndex(parseInt(this.value));
+            }
+        });
+        $('#auto-button').click(function() {
+            if(timer) {
+                clearInterval(timer);
+                timer = undefined;
+                $('#auto-button').text('Auto');
+            } else {
+                var wait = parseInt($('#auto-wait').val());
+                timer = setInterval(function() {
+                    if(setBoardIndex(boardIndex + 1)) {
+                        drawBoard(history[boardIndex]);
+                    } else {
+                        clearInterval(timer);
+                        timer = undefined;
+                        $('#auto-button').text('Auto');
+                    }
+                }, wait);
+                $('#auto-button').text('Stop');
             }
         });
 

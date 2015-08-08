@@ -78,11 +78,13 @@ public class Main {
         simulatorResultWriter.write(board);
         while (commandReader.hasNext()) {
             final Command cmd = commandReader.next();
-            board.operate(cmd);
-            simulatorResultWriter.write(board);
             if (board.hasEnded()) {
+                board.violateRule();
+                simulatorResultWriter.write(board);
                 break;
             }
+            board.operate(cmd);
+            simulatorResultWriter.write(board);
         }
         simulatorResultWriter.close();
     }
