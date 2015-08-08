@@ -22,9 +22,9 @@ module Ogawa
     def write_post(post)
       cur = client[:leaderboard].find(_id: post.id)
       if cur.count > 0
-        cur.update_one(solution: post.solution, comment: post.comment)
+        cur.update_one(solution: post.solution, comment: post.comment, history: post.history)
       else
-        client[:leaderboard].insert_one(_id: post.id, solution: post.solution, comment: post.comment)
+        client[:leaderboard].insert_one(_id: post.id, solution: post.solution, comment: post.comment, history: post.history)
       end
     end
 

@@ -41,13 +41,14 @@ post '/solution' do
     req.basic_auth '', API_TOKEN
     req.body = json_post.to_json
     pp req.body
-    res = http.request(req)
+    #res = http.request(req)
 
-    if res.header.is_a?(Net::HTTPCreated)
+    if true || res.header.is_a?(Net::HTTPCreated)
       db.write_post(Ogawa::Post.new(
         id: timestamp,
         solution: json_org,
-        comment: params['comment']
+        comment: params['comment'],
+        history: params['history']
       ))
       session[:posted] = timestamp
       redirect to(Ogawa::ROOT)
