@@ -24,8 +24,15 @@ def get_game(prob_id, seed, rev):
         logger.warning('game not found.')
         return Response(json.dumps({'error': 'specified game not found.'}), content_type='application/json')
     logger.info('game found.')
-    logger.info(documents)
-    return Response(json.dumps(documents), content_type='application/json')
+
+    # filter duplicated docs
+    result = []
+    used_turn = set()
+    for document in documents:
+        if document['turn'] not in used_turn:
+            result.append(document)
+            used_turn.add(document['turn'])
+    return Response(json.dumps(result), content_type='application/json')
 
 
 @app.route("/board/<int:prob_id>/<int:seed>/<rev>/<int:turn>/")
