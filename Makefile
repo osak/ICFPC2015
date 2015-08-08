@@ -1,3 +1,5 @@
+default: solution.exe
+
 visdump: solution
 	mkdir -p visdump
 	python src/python/visdump.py sim/run.py problems output visdump
@@ -21,7 +23,7 @@ solution.exe: $(CPP_SOURCE)
 
 solver-source: gachi-source.tar.gz
 
-SOLVER_DEPENDENCY = $(CPP_SOURCE) src/python/runner.py src/python/translate.py Makefile README
+SOLVER_DEPENDENCY = $(CPP_SOURCE) src/__init__.py src/python/__init__.py src/python/runner.py src/python/translate.py Makefile README play_icfp2015
 gachi-source.tar.gz:
 	tar czf gachi-source.tar.gz $(SOLVER_DEPENDENCY)
 
