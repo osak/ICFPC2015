@@ -1,4 +1,4 @@
-package icfpc.io;
+package icfpc.io.model;
 
 import icfpc.common.OriginalCell;
 import icfpc.common.Unit;

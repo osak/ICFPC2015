@@ -1,7 +1,6 @@
 package icfpc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import icfpc.cli.CommandLineOption;
@@ -9,14 +8,11 @@ import icfpc.common.Board;
 import icfpc.common.Cell;
 import icfpc.common.GameSettings;
 import icfpc.common.OriginalCell;
-import icfpc.io.Answer;
 import icfpc.io.CommandReader;
-import icfpc.io.DefaultSimulatorResultWriter;
-import icfpc.io.MockSimulatorResultWriter;
-import icfpc.io.Problem;
-import icfpc.io.SimpleSimulatorResultWriter;
-import icfpc.io.SimulatorResultWriter;
+import icfpc.io.SimulatorDumpWriter;
 import icfpc.io.StdInCommandReader;
+import icfpc.io.model.Answer;
+import icfpc.io.model.Problem;
 import icfpc.random.Randomizer;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
@@ -30,7 +26,8 @@ import java.util.List;
  * @author masata
  */
 public class Main {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final Logger LOGGER = Logger.getLogger(Main.class);
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public static void main(final String[] args) throws Exception {
         setLogger();
@@ -48,7 +45,7 @@ public class Main {
             Logger.getRootLogger().setLevel(Level.INFO);
         }
 
-        final Problem problem = mapper.readValue(opts.getProblemFile(), Problem.class);
+        final Problem problem = opts.getProblem();
         final List<Cell> cellFilled = FluentIterable.from(problem.filled).transform(new Function<OriginalCell, Cell>() {
             @Nullable
             @Override
@@ -56,19 +53,6 @@ public class Main {
                 return input.toCell();
             }
         }).toImmutableList();
-        final GameSettings gameSettings = new GameSettings(problem.width, problem.height, problem.units, problem.sourceLength);
-
-        final SimulatorResultWriter simulatorResultWriter;
-        switch (opts.getMode()) {
-            case NORMAL:
-                simulatorResultWriter = new DefaultSimulatorResultWriter(System.out, gameSettings);
-                break;
-            case SIMPLE:
-                simulatorResultWriter = new SimpleSimulatorResultWriter(System.out, new Board(gameSettings, new Randomizer(problem.sourceSeeds.get(0)), cellFilled));
-                break;
-            default:
-                simulatorResultWriter = new MockSimulatorResultWriter();
-        }
 
         final int n = problem.sourceSeeds.size();
         int sumScore = 0;
@@ -76,28 +60,35 @@ public class Main {
         double sumElapsedTime = 0;
         int alive = 0;
         for (int i = 0; i < n; i++) {
+            final int seed = problem.sourceSeeds.get(i);
+            final SimulatorDumpWriter simulatorDumpWriter = opts.getDumpWriter();
+            final GameSettings gameSettings = new GameSettings(problem.width, problem.height, problem.units, problem.sourceLength, seed);
             final CommandReader commandReader;
-            if (opts.getMode() != CommandLineOption.Mode.INTERACTIVE) {
-                final TypeFactory typeFactory = TypeFactory.defaultInstance();
-                final List<Answer> answers = mapper.readValue(opts.getAnswerFile(), typeFactory.constructCollectionType(List.class, Answer.class));
-                commandReader = answers.get(i).getCommandReader();
-                simulatorResultWriter.write("expectedScore", answers.get(i).expectedScore);
-                sumElapsedTime += answers.get(i).elapsedTime;
-            } else {
+            if (opts.getMode() == CommandLineOption.Mode.INTERACTIVE) {
                 commandReader = new StdInCommandReader();
+            } else {
+                final Answer answer = opts.getAnswerBySeed(seed);
+                if (answer == null) {
+                    LOGGER.warn(String.format("No answer found for seed %d", seed));
+                    continue;
+                }
+                commandReader = answer.getCommandReader();
+                simulatorDumpWriter.write("expectedScore", answer.expectedScore);
+                sumElapsedTime += answer.elapsedTime;
             }
 
-            final Randomizer randomizer = new Randomizer(problem.sourceSeeds.get(i));
+            final Randomizer randomizer = new Randomizer(seed);
             final Board board = new Board(gameSettings, randomizer, cellFilled);
+            simulatorDumpWriter.begin(board);
             if (i == 0) {
-                simulatorResultWriter.write(board);
+                simulatorDumpWriter.write(board);
             }
             while (commandReader.hasNext()) {
                 final char cmd = commandReader.next();
                 if (board.hasEnded()) {
                     board.violateRule("余分な命令");
                     if (i == 0) {
-                        simulatorResultWriter.write(board);
+                        simulatorDumpWriter.write(board);
                     }
                     break;
                 }
@@ -106,7 +97,7 @@ public class Main {
                     board.debug();
                 }
                 if (i == 0) {
-                    simulatorResultWriter.write(board);
+                    simulatorDumpWriter.write(board);
                 }
 
                 if (board.hasEnded()) {
@@ -116,19 +107,21 @@ public class Main {
             sumScore += board.getScore();
             sumSpawn += board.getSpawnedUnitCount();
             if (i == 0) {
-                simulatorResultWriter.write("SampleScore", board.getScore());
+                simulatorDumpWriter.write("SampleScore", board.getScore());
             }
             if (board.getSpawnedUnitCount() == problem.sourceLength) {
                 alive++;
             }
-            simulatorResultWriter.write("memo", board.memo);
+            if (board.memo != null) {
+                simulatorDumpWriter.write("memo", board.memo);
+            }
+            simulatorDumpWriter.close();
         }
-        simulatorResultWriter.write("averageScore", sumScore / n);
-        simulatorResultWriter.write("averageElapsedTime", sumElapsedTime / n);
-        simulatorResultWriter.write("aliveCount", alive);
-        simulatorResultWriter.write("aliveRate", (double)sumSpawn / (n * problem.sourceLength));
-        simulatorResultWriter.write("testCaseCount", n);
-        simulatorResultWriter.close();
+        LOGGER.info("averageScore: " + sumScore / n);
+        LOGGER.info("averageElapsedTime: " + sumElapsedTime / n);
+        LOGGER.info("aliveCount: " + alive);
+        LOGGER.info("aliveRate: " + (double) sumSpawn / (n * problem.sourceLength));
+        LOGGER.info("testCaseCount: " + n);
     }
 
     private static void setLogger() {
