@@ -4,7 +4,7 @@ import os
 import json
 from translate import translate_single
 
-aidebug_dir = ''
+aidebug_dir = None
 
 
 def get_path(input_path, problem_id):
@@ -24,8 +24,9 @@ def run(exe_path, config, seed):
     input_string = translate_single(config, seed)
     proc = subprocess.Popen([exe_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     command, stderr = proc.communicate(input_string)
-    with open(get_path(aidebug_dir, config['id']) + '.{}.txt'.format(seed), 'w') as writer:
-        writer.write(stderr)
+    if aidebug_dir:
+        with open(get_path(aidebug_dir, config['id']) + '.{}.txt'.format(seed), 'w') as writer:
+            writer.write(stderr)
     return create_single_output(config, seed, command)
 
 
@@ -45,19 +46,17 @@ def solve_all(exe_path, input_path, output_path):
 
 
 def main():
-    if not (5 <= len(sys.argv) <= 6):
-        print >>sys.stderr, '[USAGE] {} [solver binary] [input dir] [output dir] [aidebug dir] [problem id]'.format(sys.argv[0])
-        print >>sys.stderr, 'problem id to specify problem. if absent, all problems are solved.'
+    if not (4 <= len(sys.argv) <= 5):
+        print >>sys.stderr, '[USAGE] {} [solver binary] [input dir] [output dir] [aidebug dir]'.format(sys.argv[0])
+        print >>sys.stderr, 'aidebug dir to specify debug dump dest. if absent, debug outputs are omitted.'
         exit(1)
     exe_path = sys.argv[1]
     input_path = sys.argv[2]
     output_path = sys.argv[3]
-    global aidebug_dir
-    aidebug_dir = sys.argv[4]
     if len(sys.argv) == 5:
-        solve_all(exe_path, input_path, output_path)
-    else:
-        solve(exe_path, input_path, output_path, int(sys.argv[5]))
+        global aidebug_dir
+        aidebug_dir = sys.argv[4]
+    solve_all(exe_path, input_path, output_path)
 
 
 if __name__ == '__main__':

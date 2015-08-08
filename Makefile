@@ -5,17 +5,19 @@ visdump: solution
 submit: solution
 	bash allsubmit.sh
 
-solution: solution.exe
+solution-with-debug: solution.exe
 	mkdir -p output
 	mkdir -p aidebug
 	python src/python/runner.py ./solution.exe problems output aidebug
+
+solution: solution.exe
+	mkdir -p output
+	mkdir -p aidebug
+	python src/python/runner.py ./solution.exe problems output
 
 CPP_SOURCE=ai/ai.cpp
 solution.exe: $(CPP_SOURCE)
 	c++ -std=c++11 -O3 -o $@ $<
 
 clean:
-	rm solution.exe
-	rm -rf output
-	rm -rf visdump
-	rm -rf aidebug
+	rm -rf solution.exe output visdump aidebug
