@@ -2,6 +2,7 @@ package icfpc.io;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import icfpc.common.Board;
+import icfpc.common.GameSettings;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,7 +16,7 @@ public class DefaultSimulatorResultWriter implements SimulatorResultWriter {
     private final OutputStream outputStream;
     private boolean firstElement;
 
-    public DefaultSimulatorResultWriter(final OutputStream outputStream) throws IOException {
+    public DefaultSimulatorResultWriter(final OutputStream outputStream, final GameSettings gameSettings) throws IOException {
         this.outputStream = outputStream;
         this.firstElement = true;
         outputStream.write("[".getBytes());

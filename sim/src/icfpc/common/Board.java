@@ -3,6 +3,7 @@ package icfpc.common;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import icfpc.random.Randomizer;
@@ -31,33 +33,25 @@ import java.util.Set;
 @JsonDeserialize(using = Board.Deserializer.class)
 public class Board {
     private static final Logger LOGGER = Logger.getLogger(Board.class);
-    private final int width;
-    private final int height;
-    private final List<Unit> units;
-    private final int maxSources;
+    private final GameSettings gameSettings;
+
     private Set<Cell> filled;
     private Unit currentUnit;
     private Cell currentUnitPivot;
     private Angle currentAngle;
     private Randomizer randomizer;
     private boolean gameInProgress = true;
-    private int prevClearedRows;
-    private int moveScore;
-    private int powerScore;
+    private int prevClearedRows = 0;
+    private int moveScore = 0;
+    private int powerScore = 0;
     private int spawnedUnitCount = 0;
     // TODO シングルゲームの設定みたいなクラスにまとめる
     // TODO そもそもボード以外の状態を切り分ける
 
-    public Board(final int width, final int height, final List<Unit> units, final Randomizer randomizer, final int maxSources, Collection<? extends Cell> filled) {
-        this.width = width;
-        this.height = height;
-        this.units = units;
+    public Board(final GameSettings gameSettings, final Randomizer randomizer, final Collection<? extends Cell> filled) {
+        this.gameSettings = gameSettings;
         this.randomizer = randomizer;
         this.filled = new HashSet<>(filled);
-        this.prevClearedRows = 0;
-        this.moveScore = 0;
-        this.powerScore = 0;
-        this.maxSources = maxSources;
         spawn();
     }
 
@@ -67,7 +61,7 @@ public class Board {
 
     private void spawn(final Unit unit) {
         final Cell pivot = unit.pivot.toCell().plusVector(spawnVector(unit));
-        if (spawnedUnitCount >= maxSources) {
+        if (spawnedUnitCount >= gameSettings.maxSources) {
             gameInProgress = false;
             LOGGER.debug("ゲームは終了しました。");
             debug();
@@ -86,8 +80,8 @@ public class Board {
 
     private void spawn() {
         if (gameInProgress) {
-            int unitId = randomizer.next(units.size());
-            spawn(units.get(unitId));
+            int unitId = randomizer.next(gameSettings.units.size());
+            spawn(gameSettings.units.get(unitId));
         } else {
             LOGGER.warn("Game has ended");
         }
@@ -115,7 +109,7 @@ public class Board {
                 return false;
             }
             final OriginalCell occ = c.toOriginalCell();
-            if (occ.x < 0 || occ.x >= width || occ.y < 0 || occ.y >= height) {
+            if (occ.x < 0 || occ.x >= gameSettings.width || occ.y < 0 || occ.y >= gameSettings.height) {
                 return false;
             }
         }
@@ -126,9 +120,9 @@ public class Board {
         filled.addAll(getUnitCells());
         final Set<Cell> newFilled = new HashSet<>();
         int clearedRowCount = 0;
-        for (int y = height - 1; y >= 0; y--) {
+        for (int y = gameSettings.height - 1; y >= 0; y--) {
             boolean rowFilled = true;
-            for (int x = 0; x < width; x++) {
+            for (int x = 0; x < gameSettings.width; x++) {
                 if (filled.contains(new OriginalCell(x, y).toCell())) {
                     newFilled.add(new OriginalCell(x, y + clearedRowCount).toCell());
                 } else {
@@ -136,7 +130,7 @@ public class Board {
                 }
             }
             if (rowFilled) {
-                for (int x = 0; x < width; x++) {
+                for (int x = 0; x < gameSettings.width; x++) {
                     newFilled.remove(new OriginalCell(x, y + clearedRowCount).toCell());
                 }
                 clearedRowCount += 1;
@@ -215,15 +209,15 @@ public class Board {
     }
 
     private void debug() {
-        char[][] f = new char[width][height];
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        char[][] f = new char[gameSettings.width][gameSettings.height];
+        for (int x = 0; x < gameSettings.width; x++) {
+            for (int y = 0; y < gameSettings.height; y++) {
                 f[x][y] = '.';
             }
         }
 
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        for (int x = 0; x < gameSettings.width; x++) {
+            for (int y = 0; y < gameSettings.height; y++) {
                 if (filled.contains(Cell.fromOriginal(new OriginalCell(x, y)))) {
                     f[x][y] = '#';
                 }
@@ -240,18 +234,18 @@ public class Board {
         final StringBuilder sb = new StringBuilder("\n");
         if (currentUnitPivot != null) {
             final OriginalCell ocPivot = currentUnitPivot.toOriginalCell();
-            if (ocPivot.x >= 0 && ocPivot.x < width && ocPivot.y >= 0 && ocPivot.y < height) {
+            if (ocPivot.x >= 0 && ocPivot.x < gameSettings.width && ocPivot.y >= 0 && ocPivot.y < gameSettings.height) {
                 f[ocPivot.x][ocPivot.y] = f[ocPivot.x][ocPivot.y] == '.' ? '~' : '@';
             } else {
                 LOGGER.debug(String.format("pivot: (%d, %d)\n", ocPivot.x, ocPivot.y));
             }
         }
 
-        for (int y = 0; y < height; y++) {
+        for (int y = 0; y < gameSettings.height; y++) {
             if (y % 2 != 0) {
                 sb.append(' ');
             }
-            for (int x = 0; x < width; x++) {
+            for (int x = 0; x < gameSettings.width; x++) {
                 sb.append(f[x][y]);
                 sb.append(' ');
             }
@@ -261,9 +255,9 @@ public class Board {
     }
 
     private Cell spawnVector(final Unit unit) {
-        int topmost = height;
-        int leftSpace = width * 2;
-        int rightSpace = width * 2;
+        int topmost = gameSettings.height;
+        int leftSpace = gameSettings.width * 2;
+        int rightSpace = gameSettings.width * 2;
         for (OriginalCell oc : unit.members) {
             topmost = Math.min(topmost, oc.toCell().y);
         }
@@ -271,7 +265,7 @@ public class Board {
             // (-y, -1)に仮おき
             Cell c = oc.toCell();
             int leftSide = c.y % 2 == 0 ? 0 : 1;
-            int rightSide = 2 * (width - 1) + leftSide;
+            int rightSide = 2 * (gameSettings.width - 1) + leftSide;
             int y = c.y - topmost;
             if (y % 2 != 0 && oc.y % 2 != 0) {
                 leftSpace = Math.min(leftSpace, (c.x - 1 - leftSide));
@@ -308,8 +302,6 @@ public class Board {
                 gen.writeEndObject();
             }
             gen.writeEndArray();
-            gen.writeNumberField("width", value.width);
-            gen.writeNumberField("height", value.height);
             if (value.currentUnitPivot != null) {
                 gen.writeFieldName("pivot");
                 gen.writeStartObject();
@@ -322,18 +314,17 @@ public class Board {
             gen.writeNumberField("moveScore", value.moveScore);
             gen.writeNumberField("powerScore", value.powerScore);
             gen.writeNumberField("clearedRows", value.prevClearedRows);
-            gen.writeNumberField("maxSources", value.maxSources);
+            gen.writeObjectField("settings", value.gameSettings);
             gen.writeEndObject();
         }
     }
 
     public static class Deserializer extends JsonDeserializer<Board> {
+        private static final TypeFactory FACTORY = TypeFactory.defaultInstance();
+
         @Override
         public Board deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
             JsonNode root = p.getCodec().readTree(p);
-            final int width = root.get("width").asInt();
-            final int height = root.get("height").asInt();
-            final int maxSources = root.get("maxSources").asInt();
             final List<Cell> filled = new ArrayList<>();
             for (final Iterator<JsonNode> it = root.get("fullCells").elements(); it.hasNext(); ) {
                 final JsonNode node = it.next();
@@ -348,7 +339,11 @@ public class Board {
             }
             final Cell pivot = new OriginalCell(root.get("pivot").get("x").asInt(), root.get("pivot").get("y").asInt()).toCell();
             final Randomizer randomizer = new Randomizer(root.get("randomSeed").asInt());
-            final Board ret = new Board(width, height, null, randomizer, maxSources, filled); // TODO units null
+            final int width = root.get("width").asInt();
+            final int height = root.get("height").asInt();
+            final int maxSources = root.get("maxSources").asInt();
+            final List<Unit> units = root.get("units").traverse(p.getCodec()).readValueAs(new TypeReference<List<Unit>>() {});
+            final Board ret = new Board(new GameSettings(width, height, units, maxSources), randomizer, filled);
             final Unit unit = new Unit(FluentIterable.from(unitCells).transform(new Function<Cell, OriginalCell>() {
                 @Nullable
                 @Override
