@@ -161,24 +161,20 @@
     function initGame() {
         console.log('hoge');
         $('#canvas').keypress(function(e) {
-            console.log(e);
-            var command = COMMAND_TABLE[e.keyCode];
+            var command = COMMAND_TABLE[e.charCode];
             var board = history[boardIndex];
             $.ajax({
-                url: 'http://icfpc.osak.jp:4685/miichan',
+                url: 'http://icfpc.osak.jp/miichan',
                 contentType: 'application/json',
                 method: 'POST',
-                data: {
+                data: JSON.stringify({
                     command: command,
                     board: board
-                }
+                })
             }).done(function(res) {
                 console.log(res);
-                if(result.Result) {
-                    history[boardIndex] = result.Board;
-                } else {
-                    alert('Invalid move');
-                }
+                history[boardIndex] = res.Board;
+                drawBoard(history[boardIndex]);
             });
         });
     }
