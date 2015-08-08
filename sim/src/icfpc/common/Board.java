@@ -35,10 +35,18 @@ public class Board {
     private Cell currentUnitPivot;
     private Angle currentAngle;
 
+    private int prevClearedRows;
+    private int moveScore;
+    private int powerScore;
+
     public Board(final int width, final int height, Collection<? extends Cell> filled) {
         this.width = width;
         this.height = height;
         this.filled = new HashSet<>(filled);
+
+        this.prevClearedRows = 0;
+        this.moveScore = 0;
+        this.powerScore = 0;
     }
 
     /**
@@ -109,8 +117,26 @@ public class Board {
         if (clearedRowCount > 0) {
             System.err.println("[DEBUG]" + clearedRowCount + " rows are cleared!");
         }
+
+        accMoveScore(currentUnit.members.size(), clearedRowCount);
+        accPowerScore();
+        prevClearedRows = clearedRowCount;
         filled = newFilled;
         currentUnit = null;
+    }
+
+    private void accMoveScore(final int size, int ls) {
+        int points = size + 100 * (1 + ls) * ls / 2;
+        int line_bonus = prevClearedRows > 1 ? (int) Math.floor((prevClearedRows - 1) * points / 10) : 0;
+        moveScore += points + line_bonus;
+    }
+
+    private void accPowerScore() {
+        powerScore += 0;
+    }
+
+    public int getScore() {
+        return moveScore + powerScore;
     }
 
     /**
@@ -265,6 +291,11 @@ public class Board {
                 gen.writeNumberField("y", value.currentUnitPivot.toOriginalCell().y);
                 gen.writeEndObject();
             }
+
+            gen.writeNumberField("score", value.getScore());
+            gen.writeNumberField("moveScore", value.moveScore);
+            gen.writeNumberField("powerScore", value.powerScore);
+            gen.writeNumberField("clearedRows", value.prevClearedRows);
             gen.writeEndObject();
         }
     }
@@ -299,6 +330,11 @@ public class Board {
             ret.currentUnit = unit;
             ret.currentUnitPivot = pivot;
             ret.currentAngle = Angle.CLOCK_0;
+
+            ret.moveScore = root.get("moveScore").asInt();
+            ret.powerScore = root.get("powerScore").asInt();
+            ret.prevClearedRows = root.get("clearedRows").asInt();
+
             return ret;
         }
     }
