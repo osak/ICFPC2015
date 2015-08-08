@@ -13,7 +13,8 @@ end
 
 CHUNK_SIZE = 1000
 
-client = Mongo::Client.new(['icfpc.osak.jp'], database: 'kadingel')
+Mongo::Logger.logger.level = ::Logger::INFO
+client = Mongo::Client.new(['172.31.34.41'], database: 'kadingel')
 
 workdir = ARGV[0]
 revision = ARGV[1]
