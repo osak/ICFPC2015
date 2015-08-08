@@ -25,7 +25,7 @@ output/%: solution.exe
 	mkdir -p output
 	./play_icfp2015 -f problems/$* > output/$*
 
-CPP_SOURCE = ai/ai.cpp
+CPP_SOURCE = ai/AI/lightningAI.cpp ai/evaluation/lightningeval.cpp ai/main.cpp ai/util.cpp
 solution.exe: $(CPP_SOURCE)
 	c++ -std=c++11 -O3 -o $@ $^
 

@@ -8,7 +8,8 @@ import java.io.IOException;
 /**
  * @author masata
  */
-public interface SimulatorResultWriter extends Closeable {
+public interface SimulatorDumpWriter extends Closeable {
+    void begin(final Board board) throws IOException;
     void write(final Board board) throws IOException;
     void write(final String fieldName, final Object object) throws IOException;
 }

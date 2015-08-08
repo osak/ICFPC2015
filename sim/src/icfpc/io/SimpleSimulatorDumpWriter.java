@@ -13,21 +13,25 @@ import java.util.Map;
 /**
  * @author masata
  */
-public class SimpleSimulatorResultWriter implements SimulatorResultWriter {
+public class SimpleSimulatorDumpWriter implements SimulatorDumpWriter {
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final Logger LOGGER = Logger.getLogger(SimpleSimulatorResultWriter.class);
+    private static final Logger LOGGER = Logger.getLogger(SimpleSimulatorDumpWriter.class);
 
     private final OutputStream outputStream;
     private boolean firstElement;
     private Map<String, Object> appendix = new HashMap<>();
 
-    public SimpleSimulatorResultWriter(final OutputStream outputStream, final Board initialBoard) throws IOException{
+    public SimpleSimulatorDumpWriter(final OutputStream outputStream) {
         this.outputStream = outputStream;
         this.firstElement = true;
+    }
+
+    @Override
+    public void begin(Board board) throws IOException {
         outputStream.write(String.format(
                 "{\"settings\": %s, \"initialBoard\": %s, \"diffBoards\": [\n",
-                MAPPER.writeValueAsString(initialBoard.getGameSettings()),
-                MAPPER.writeValueAsString(initialBoard)
+                MAPPER.writeValueAsString(board.getGameSettings()),
+                MAPPER.writeValueAsString(board)
         ).getBytes());
     }
 

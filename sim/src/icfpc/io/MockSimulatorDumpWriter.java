@@ -7,7 +7,12 @@ import java.io.IOException;
 /**
  * @author masata
  */
-public class MockSimulatorResultWriter implements SimulatorResultWriter {
+public class MockSimulatorDumpWriter implements SimulatorDumpWriter {
+    @Override
+    public void begin(Board board) throws IOException {
+
+    }
+
     @Override
     public void write(Board board) throws IOException {
     }

@@ -1,6 +1,7 @@
-package icfpc.io;
+package icfpc.io.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import icfpc.io.CommandReader;
 
 /**
  * @author masata

@@ -1,6 +1,14 @@
 package icfpc.cli;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Preconditions;
+import icfpc.io.DefaultSimulatorDumpWriter;
+import icfpc.io.MockSimulatorDumpWriter;
+import icfpc.io.SimpleSimulatorDumpWriter;
+import icfpc.io.SimulatorDumpWriter;
+import icfpc.io.model.Answer;
+import icfpc.io.model.Problem;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -12,28 +20,34 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 /**
  * @author masata
  */
 public class CommandLineOption extends Options {
     private static final Logger LOGGER = Logger.getLogger(CommandLineOption.class);
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final TypeFactory TYPE_FACTORY = TypeFactory.defaultInstance();
 
     private final boolean debugMode;
-    private final URL problemFile;
-    private final URL answerFile;
+    private final Problem problem;
+    private final List<Answer> answers;
+    private final SimulatorDumpWriter dumpWriter;
     private final Mode mode;
 
     private CommandLineOption(
             final Mode mode,
             final boolean debugMode,
-            final URL problemFile,
-            final URL answerFile
+            final Problem problem,
+            final List<Answer> answers,
+            final SimulatorDumpWriter dumpWriter
     ) {
         this.debugMode = debugMode;
-        this.problemFile = problemFile;
-        this.answerFile = answerFile;
+        this.problem = problem;
+        this.answers = answers;
         this.mode = mode;
+        this.dumpWriter = dumpWriter;
     }
 
     public Mode getMode() {
@@ -42,11 +56,22 @@ public class CommandLineOption extends Options {
     public boolean isDebugMode() {
         return debugMode;
     }
-    public URL getProblemFile() {
-        return problemFile;
+    public Problem getProblem() {
+        return problem;
     }
-    public URL getAnswerFile() {
-        return answerFile;
+    public List<Answer> getAnswers() {
+        return answers;
+    }
+    public Answer getAnswerBySeed(final int seed) {
+        for (final Answer answer : answers) {
+            if (answer.seed == seed) {
+                return answer;
+            }
+        }
+        return null;
+    }
+    public SimulatorDumpWriter getDumpWriter() {
+        return dumpWriter;
     }
 
     public static void printHelp() {
@@ -126,12 +151,36 @@ public class CommandLineOption extends Options {
             return this;
         }
 
-        public CommandLineOption build() {
+        public CommandLineOption build() throws IOException {
             Preconditions.checkNotNull(problemFile);
             if (mode != Mode.INTERACTIVE) {
                 Preconditions.checkNotNull(answerFile);
+                final List<Answer> answers = MAPPER.readValue(answerFile, TYPE_FACTORY.constructCollectionType(List.class, Answer.class));
+                return new CommandLineOption(
+                        mode,
+                        debugMode,
+                        MAPPER.readValue(problemFile, Problem.class),
+                        answers,
+                        makeDumpWriter(mode));
+            } else {
+                return new CommandLineOption(
+                        mode,
+                        debugMode,
+                        MAPPER.readValue(problemFile, Problem.class),
+                        null,
+                        makeDumpWriter(mode));
             }
-            return new CommandLineOption(mode, debugMode, problemFile, answerFile);
+        }
+
+        private static SimulatorDumpWriter makeDumpWriter(final Mode mode) {
+            switch (mode) {
+                case NORMAL:
+                    return new DefaultSimulatorDumpWriter(System.out);
+                case SIMPLE:
+                    return new SimpleSimulatorDumpWriter(System.out);
+                default:
+                    return new MockSimulatorDumpWriter();
+            }
         }
     }
 

@@ -445,7 +445,7 @@ public class Board {
             //final int maxSources = root.get("maxSources").asInt();
             //final List<Unit> units = root.get("units").traverse(p.getCodec()).readValueAs(new TypeReference<List<Unit>>() {});
             //final Board ret = new Board(new GameSettings(width, height, units, maxSources), randomizer, filled);
-            final Board ret = new Board(new GameSettings(10, 10, ImmutableList.<Unit>of(), 100), randomizer, filled);
+            final Board ret = new Board(new GameSettings(10, 10, ImmutableList.<Unit>of(), 100, 0), randomizer, filled);
             final Unit unit = new Unit(FluentIterable.from(unitCells).transform(new Function<Cell, OriginalCell>() {
                 @Nullable
                 @Override
