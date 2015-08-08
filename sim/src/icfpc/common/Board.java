@@ -48,6 +48,7 @@ public class Board {
     private int spawnedUnitCount = 0;
     private boolean isNewUnit;
     private Set<Set<Cell>> moveHistory;
+    public String memo;
     // TODO シングルゲームの設定みたいなクラスにまとめる
     // TODO そもそもボード以外の状態を切り分ける
 
@@ -228,6 +229,7 @@ public class Board {
                 return true;
             case INVALID:
                 violateRule();
+                memo = "invalid move";
                 return false;
             default:
                 throw new Error("WOW");
@@ -243,6 +245,7 @@ public class Board {
 
         if (!historyCheck()) {
             violateRule();
+            memo = "same history";
             return false;
         }
 
@@ -251,7 +254,7 @@ public class Board {
 
     private boolean historyCheck() {
         final Set<Cell> cells = Sets.newHashSet(getUnitCells());
-        cells.add(currentUnitPivot);
+        cells.add(currentUnitPivot.plusVector(new Cell(-100000, -100000)));
         if (moveHistory.contains(cells)) {
             return false;
         }
