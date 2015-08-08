@@ -14,6 +14,7 @@ import icfpc.io.CommandReader;
 import icfpc.io.DefaultSimulatorResultWriter;
 import icfpc.io.MockSimulatorResultWriter;
 import icfpc.io.Problem;
+import icfpc.io.SimpleSimulatorResultWriter;
 import icfpc.io.SimulatorResultWriter;
 import icfpc.io.StdInCommandReader;
 import icfpc.random.Randomizer;
@@ -48,13 +49,25 @@ public class Main {
         }
 
         final Problem problem = mapper.readValue(opts.getProblemFile(), Problem.class);
+        final List<Cell> cellFilled = FluentIterable.from(problem.filled).transform(new Function<OriginalCell, Cell>() {
+            @Nullable
+            @Override
+            public Cell apply(OriginalCell input) {
+                return input.toCell();
+            }
+        }).toImmutableList();
         final GameSettings gameSettings = new GameSettings(problem.width, problem.height, problem.units, problem.sourceLength);
 
         final SimulatorResultWriter simulatorResultWriter;
-        if (opts.isNormalMode()) {
-            simulatorResultWriter = new DefaultSimulatorResultWriter(System.out, gameSettings);
-        } else {
-            simulatorResultWriter = new MockSimulatorResultWriter();
+        switch (opts.getMode()) {
+            case NORMAL:
+                simulatorResultWriter = new DefaultSimulatorResultWriter(System.out, gameSettings);
+                break;
+            case SIMPLE:
+                simulatorResultWriter = new SimpleSimulatorResultWriter(System.out, new Board(gameSettings, new Randomizer(problem.sourceSeeds.get(0)), cellFilled));
+                break;
+            default:
+                simulatorResultWriter = new MockSimulatorResultWriter();
         }
 
         final int n = problem.sourceSeeds.size();
@@ -63,7 +76,7 @@ public class Main {
         int alive = 0;
         for (int i = 0; i < n; i++) {
             final CommandReader commandReader;
-            if (opts.isNormalMode()) {
+            if (opts.getMode() != CommandLineOption.Mode.INTERACTIVE) {
                 final TypeFactory typeFactory = TypeFactory.defaultInstance();
                 final List<Answer> answers = mapper.readValue(opts.getAnswerFile(), typeFactory.constructCollectionType(List.class, Answer.class));
                 commandReader = answers.get(i).getCommandReader();
@@ -73,13 +86,7 @@ public class Main {
             }
 
             final Randomizer randomizer = new Randomizer(problem.sourceSeeds.get(i));
-            final Board board = new Board(gameSettings, randomizer, FluentIterable.from(problem.filled).transform(new Function<OriginalCell, Cell>() {
-                @Nullable
-                @Override
-                public Cell apply(OriginalCell input) {
-                    return input.toCell();
-                }
-            }).toImmutableList());
+            final Board board = new Board(gameSettings, randomizer, cellFilled);
             if (i == 0) {
                 simulatorResultWriter.write(board);
             }
@@ -94,6 +101,9 @@ public class Main {
                     break;
                 }
                 board.operate(cmd);
+                if (opts.getMode() == CommandLineOption.Mode.INTERACTIVE) {
+                    board.debug();
+                }
                 if (i == 0) {
                     simulatorResultWriter.write(board);
                 }

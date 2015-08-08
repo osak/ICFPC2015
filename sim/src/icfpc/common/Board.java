@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import icfpc.random.Randomizer;
 import org.apache.log4j.Logger;
@@ -22,6 +23,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -51,7 +53,7 @@ public class Board {
     private boolean isNewUnit;
     private Set<Set<Cell>> moveHistory;
     public String memo;
-    // TODO シングルゲームの設定みたいなクラスにまとめる
+    private SimpleBoardDiff diff = null;
     // TODO そもそもボード以外の状態を切り分ける
 
     public Board(final GameSettings gameSettings, final Randomizer randomizer, final Collection<? extends Cell> filled) {
@@ -65,6 +67,14 @@ public class Board {
         spawn();
         historyCheck();
         this.isNewUnit = false;
+    }
+
+    public GameSettings getGameSettings() {
+        return gameSettings;
+    }
+
+    public SimpleBoardDiff getDiff() {
+        return diff;
     }
 
     public boolean hasEnded() {
@@ -101,7 +111,6 @@ public class Board {
         currentUnitPivot = pivot;
         currentAngle = Angle.CLOCK_0;
         spawnedUnitCount += 1;
-        debug();
     }
 
     private void spawn() {
@@ -224,6 +233,7 @@ public class Board {
     private boolean operate(final Command command) {
         if (!gameInProgress) {
             LOGGER.warn("Game has ended.");
+            diff = null;
             return false;
         }
 
@@ -256,30 +266,35 @@ public class Board {
                 newAngle = newAngle.counterClock();
                 break;
             case NOOP:
+                diff = null;
                 return true;
             case INVALID:
                 violateRule();
                 memo = "invalid move";
+                diff = null;
                 return false;
             default:
                 throw new Error("WOW");
         }
         if (!check(currentUnit, newUnitPivot, newAngle)) {
+            final Set<Cell> prevFilled = ImmutableSet.copyOf(filled);
             lock();
+            diff = new SimpleBoardDiff(Sets.difference(filled, prevFilled), Sets.difference(prevFilled, filled), getUnitCells(), currentUnitPivot, getScore());
             isNewUnit = true;
             return false; // LOCKED!!
-        }
-        currentUnitPivot = newUnitPivot;
-        currentAngle = newAngle;
-        debug();
+        } else {
+            diff = new SimpleBoardDiff(Collections.<Cell>emptyList(), Collections.<Cell>emptyList(), getUnitCells(currentUnit, newUnitPivot, newAngle), newUnitPivot, getScore());
+            currentUnitPivot = newUnitPivot;
+            currentAngle = newAngle;
 
-        if (!historyCheck()) {
-            violateRule();
-            memo = "same history";
-            return false;
-        }
+            if (!historyCheck()) {
+                violateRule();
+                memo = "same history";
+                return false;
+            }
 
-        return true;
+            return true;
+        }
     }
 
     private boolean historyCheck() {
@@ -292,7 +307,7 @@ public class Board {
         return true;
     }
 
-    private void debug() {
+    public void debug() {
         char[][] f = new char[gameSettings.width][gameSettings.height];
         for (int x = 0; x < gameSettings.width; x++) {
             for (int y = 0; y < gameSettings.height; y++) {

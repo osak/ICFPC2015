@@ -19,28 +19,25 @@ import java.net.URL;
 public class CommandLineOption extends Options {
     private static final Logger LOGGER = Logger.getLogger(CommandLineOption.class);
 
-    private final boolean interactiveMode;
     private final boolean debugMode;
     private final URL problemFile;
     private final URL answerFile;
+    private final Mode mode;
 
     private CommandLineOption(
-            final boolean interactiveMode,
+            final Mode mode,
             final boolean debugMode,
             final URL problemFile,
             final URL answerFile
     ) {
-        this.interactiveMode = interactiveMode;
         this.debugMode = debugMode;
         this.problemFile = problemFile;
         this.answerFile = answerFile;
+        this.mode = mode;
     }
 
-    public boolean isInteractiveMode() {
-        return interactiveMode;
-    }
-    public boolean isNormalMode() {
-        return !interactiveMode;
+    public Mode getMode() {
+        return mode;
     }
     public boolean isDebugMode() {
         return debugMode;
@@ -59,8 +56,12 @@ public class CommandLineOption extends Options {
     public static CommandLineOption parse(final String[] args) throws ParseException, IOException {
         final CommandLine cl = new BasicParser().parse(Ops.INSTANCE, args);
         final Builder builder = builder();
-        if (cl.hasOption("i")) {
-            builder.interactiveMode(true);
+        if (cl.hasOption("n")) {
+            builder.normalMode();
+        } else if (cl.hasOption("i")) {
+            builder.interactiveMode();
+        } else if (cl.hasOption("s")) {
+            builder.simpleMode();
         }
         if (cl.hasOption("d")) {
             builder.debugMode(true);
@@ -74,20 +75,34 @@ public class CommandLineOption extends Options {
         return builder.build();
     }
 
+    public enum Mode {
+        NORMAL,
+        SIMPLE,
+        INTERACTIVE,
+    }
+
     public static Builder builder() {
         return new Builder();
     }
 
     public static class Builder {
-        private boolean interactiveMode = false;
+        private Mode mode = Mode.NORMAL;
         private boolean debugMode = false;
         private URL problemFile;
         private URL answerFile;
 
         public Builder() {}
 
-        public Builder interactiveMode(final boolean interactiveMode) {
-            this.interactiveMode = interactiveMode;
+        public Builder normalMode() {
+            this.mode = Mode.NORMAL;
+            return this;
+        }
+        public Builder simpleMode() {
+            this.mode = Mode.SIMPLE;
+            return this;
+        }
+        public Builder interactiveMode() {
+            this.mode = Mode.INTERACTIVE;
             return this;
         }
         public Builder debugMode(final boolean debugMode) {
@@ -113,10 +128,10 @@ public class CommandLineOption extends Options {
 
         public CommandLineOption build() {
             Preconditions.checkNotNull(problemFile);
-            if (!interactiveMode) {
+            if (mode != Mode.INTERACTIVE) {
                 Preconditions.checkNotNull(answerFile);
             }
-            return new CommandLineOption(interactiveMode, debugMode, problemFile, answerFile);
+            return new CommandLineOption(mode, debugMode, problemFile, answerFile);
         }
     }
 
@@ -124,8 +139,10 @@ public class CommandLineOption extends Options {
         private static final Ops INSTANCE = new Ops();
 
         private Ops() {
-            addOption("i", false, "Interactive mode");
-            addOption("d", false, "Debug mode");
+            addOption("n", "normal", false, "Normal mode (default)");
+            addOption("i", "interactive", false, "Interactive mode");
+            addOption("s", "simple", false, "Simple mode");
+            addOption("d", false, "log4j.level=DEBUG");
             addOption("p", "problem", true, "Problem file");
             addOption("a", "answer", true, "AI output file");
         }
