@@ -3,7 +3,6 @@ package icfpc.common;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -14,7 +13,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import icfpc.random.Randomizer;
 import org.apache.log4j.Logger;
@@ -23,7 +22,6 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -360,10 +358,10 @@ public class Board {
             gen.writeNumberField("moveScore", value.moveScore);
             gen.writeNumberField("powerScore", value.powerScore);
             gen.writeNumberField("clearedRows", value.prevClearedRows);
-            gen.writeNumberField("width", value.gameSettings.width);
-            gen.writeNumberField("height", value.gameSettings.height);
-            gen.writeNumberField("maxSources", value.gameSettings.maxSources);
-            gen.writeObjectField("units", value.gameSettings.units);
+            //gen.writeNumberField("width", value.gameSettings.width);
+            //gen.writeNumberField("height", value.gameSettings.height);
+            //gen.writeNumberField("maxSources", value.gameSettings.maxSources);
+            //gen.writeObjectField("units", value.gameSettings.units);
             gen.writeEndObject();
         }
     }
@@ -388,11 +386,12 @@ public class Board {
             }
             final Cell pivot = new OriginalCell(root.get("pivot").get("x").asInt(), root.get("pivot").get("y").asInt()).toCell();
             final Randomizer randomizer = new Randomizer(root.get("randomSeed").asInt());
-            final int width = root.get("width").asInt();
-            final int height = root.get("height").asInt();
-            final int maxSources = root.get("maxSources").asInt();
-            final List<Unit> units = root.get("units").traverse(p.getCodec()).readValueAs(new TypeReference<List<Unit>>() {});
-            final Board ret = new Board(new GameSettings(width, height, units, maxSources), randomizer, filled);
+            //final int width = root.get("width").asInt();
+            //final int height = root.get("height").asInt();
+            //final int maxSources = root.get("maxSources").asInt();
+            //final List<Unit> units = root.get("units").traverse(p.getCodec()).readValueAs(new TypeReference<List<Unit>>() {});
+            //final Board ret = new Board(new GameSettings(width, height, units, maxSources), randomizer, filled);
+            final Board ret = new Board(new GameSettings(10, 10, ImmutableList.<Unit>of(), 100), randomizer, filled);
             final Unit unit = new Unit(FluentIterable.from(unitCells).transform(new Function<Cell, OriginalCell>() {
                 @Nullable
                 @Override

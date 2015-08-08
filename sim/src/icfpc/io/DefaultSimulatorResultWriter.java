@@ -19,7 +19,7 @@ public class DefaultSimulatorResultWriter implements SimulatorResultWriter {
     public DefaultSimulatorResultWriter(final OutputStream outputStream, final GameSettings gameSettings) throws IOException {
         this.outputStream = outputStream;
         this.firstElement = true;
-        outputStream.write("[".getBytes());
+        outputStream.write(String.format("{\"settings\": %s, \"boards\": [", mapper.writeValueAsString(gameSettings)).getBytes());
     }
 
     @Override
@@ -34,7 +34,7 @@ public class DefaultSimulatorResultWriter implements SimulatorResultWriter {
 
     @Override
     public void close() throws IOException {
-        outputStream.write("]".getBytes());
+        outputStream.write("]}".getBytes());
         outputStream.close();
     }
 }
