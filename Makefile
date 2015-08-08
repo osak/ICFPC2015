@@ -4,8 +4,8 @@ visdump: solution
 	mkdir -p visdump
 	python src/python/visdump.py sim/run.py problems output visdump
 
-submit: solution
-	bash allsubmit.sh
+submit: solution.exe
+	./play_icfp2015 -f problems/* | ./submit.sh
 
 solution-with-debug: solution.exe
 	mkdir -p output
