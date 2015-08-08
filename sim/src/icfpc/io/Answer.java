@@ -11,6 +11,7 @@ public class Answer {
     public String tag;
     public String solution;
     public int expectedScore;
+    public double elapsedTime;
 
     @JsonIgnore
     public CommandReader getCommandReader() {

@@ -73,6 +73,7 @@ public class Main {
         final int n = problem.sourceSeeds.size();
         int sumScore = 0;
         int sumSpawn = 0;
+        double sumElapsedTime = 0;
         int alive = 0;
         for (int i = 0; i < n; i++) {
             final CommandReader commandReader;
@@ -81,6 +82,7 @@ public class Main {
                 final List<Answer> answers = mapper.readValue(opts.getAnswerFile(), typeFactory.constructCollectionType(List.class, Answer.class));
                 commandReader = answers.get(i).getCommandReader();
                 simulatorResultWriter.write("expectedScore", answers.get(i).expectedScore);
+                sumElapsedTime += answers.get(i).elapsedTime;
             } else {
                 commandReader = new StdInCommandReader();
             }
@@ -123,6 +125,7 @@ public class Main {
             simulatorResultWriter.write("memo", board.memo);
         }
         simulatorResultWriter.write("averageScore", sumScore / n);
+        simulatorResultWriter.write("averageElapsedTime", sumElapsedTime / n);
         simulatorResultWriter.write("aliveCount", alive);
         simulatorResultWriter.write("aliveRate", (double)sumSpawn / (n * problem.sourceLength));
         simulatorResultWriter.write("testCaseCount", n);
