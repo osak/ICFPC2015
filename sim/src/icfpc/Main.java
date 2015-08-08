@@ -78,6 +78,9 @@ public class Main {
             final Command cmd = commandReader.next();
             board.operate(cmd);
             simulatorResultWriter.write(board);
+            if (board.hasEnded()) {
+                break;
+            }
         }
         simulatorResultWriter.close();
     }

@@ -25,8 +25,8 @@ public class DefaultSimulatorResultWriter implements SimulatorResultWriter {
     public void write(final Board board) throws IOException {
         if (!firstElement) {
             outputStream.write(",".getBytes());
-            firstElement = false;
         }
+        firstElement = false;
         outputStream.write(mapper.writeValueAsString(board).getBytes());
         outputStream.write("\n".getBytes());
     }

@@ -2,5 +2,5 @@
 
 for fn in `ls output`
 do
-    cat output/$fn | python submit.py "test sub"
+    cat output/$fn | python submit.py "all submission"
 done

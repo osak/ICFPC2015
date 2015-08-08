@@ -40,6 +40,9 @@ public class Board {
     private Angle currentAngle;
     private Randomizer randomizer;
     private boolean gameInProgress = true;
+    private int prevClearedRows;
+    private int moveScore;
+    private int powerScore;
 
     public Board(final int width, final int height, final List<Unit> units, final Randomizer randomizer, Collection<? extends Cell> filled) {
         this.width = width;
@@ -47,12 +50,20 @@ public class Board {
         this.units = units;
         this.randomizer = randomizer;
         this.filled = new HashSet<>(filled);
+        this.prevClearedRows = 0;
+        this.moveScore = 0;
+        this.powerScore = 0;
         spawn();
     }
+
+    public boolean hasEnded() {
+        return !gameInProgress;
+    }
+
     private void spawn(final Unit unit) {
         final Cell pivot = unit.pivot.toCell().plusVector(spawnVector(unit));
         if (!check(unit, pivot, Angle.CLOCK_0)) {
-            gameInProgress = true;
+            gameInProgress = false;
             debug();
         }
         currentUnit = unit;
@@ -122,9 +133,27 @@ public class Board {
         if (clearedRowCount > 0) {
             System.err.println("[DEBUG]" + clearedRowCount + " rows are cleared!");
         }
+
+        accMoveScore(currentUnit.members.size(), clearedRowCount);
+        accPowerScore();
+        prevClearedRows = clearedRowCount;
         filled = newFilled;
         currentUnit = null;
         spawn();
+    }
+
+    private void accMoveScore(final int size, int ls) {
+        int points = size + 100 * (1 + ls) * ls / 2;
+        int line_bonus = prevClearedRows > 1 ? (int) Math.floor((prevClearedRows - 1) * points / 10) : 0;
+        moveScore += points + line_bonus;
+    }
+
+    private void accPowerScore() {
+        powerScore += 0;
+    }
+
+    public int getScore() {
+        return moveScore + powerScore;
     }
 
     /**
@@ -277,6 +306,10 @@ public class Board {
                 gen.writeEndObject();
             }
             gen.writeNumberField("randomSeed", value.randomizer.getSeed());
+            gen.writeNumberField("score", value.getScore());
+            gen.writeNumberField("moveScore", value.moveScore);
+            gen.writeNumberField("powerScore", value.powerScore);
+            gen.writeNumberField("clearedRows", value.prevClearedRows);
             gen.writeEndObject();
         }
     }
@@ -312,6 +345,11 @@ public class Board {
             ret.currentUnit = unit;
             ret.currentUnitPivot = pivot;
             ret.currentAngle = Angle.CLOCK_0;
+
+            ret.moveScore = root.get("moveScore").asInt();
+            ret.powerScore = root.get("powerScore").asInt();
+            ret.prevClearedRows = root.get("clearedRows").asInt();
+
             return ret;
         }
     }
