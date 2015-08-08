@@ -21,7 +21,7 @@ solution.exe: $(CPP_SOURCE)
 
 solver-source: gachi-source.tar.gz
 
-SOLVER_DEPENDENCY = $(CPP_SOURCE) src/python/runner.py src/python/translate.py Makefile
+SOLVER_DEPENDENCY = $(CPP_SOURCE) src/python/runner.py src/python/translate.py Makefile README
 gachi-source.tar.gz:
 	tar czf gachi-source.tar.gz $(SOLVER_DEPENDENCY)
 
