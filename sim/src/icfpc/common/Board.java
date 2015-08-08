@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
+import icfpc.random.Randomizer;
+import org.apache.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -28,33 +30,44 @@ import java.util.Set;
 @JsonSerialize(using = Board.Serializer.class)
 @JsonDeserialize(using = Board.Deserializer.class)
 public class Board {
+    private static final Logger LOGGER = Logger.getLogger(Board.class);
     private final int width;
     private final int height;
+    private final List<Unit> units;
     private Set<Cell> filled;
     private Unit currentUnit;
     private Cell currentUnitPivot;
     private Angle currentAngle;
+    private Randomizer randomizer;
+    private boolean gameInProgress = true;
 
-    public Board(final int width, final int height, Collection<? extends Cell> filled) {
+    public Board(final int width, final int height, final List<Unit> units, final Randomizer randomizer, Collection<? extends Cell> filled) {
         this.width = width;
         this.height = height;
+        this.units = units;
+        this.randomizer = randomizer;
         this.filled = new HashSet<>(filled);
+        spawn();
     }
-
-    /**
-     *
-     * @param unit unit
-     * @return false if game ended
-     */
-    public boolean spawn(final Unit unit) {
+    private void spawn(final Unit unit) {
         final Cell pivot = unit.pivot.toCell().plusVector(spawnVector(unit));
         if (!check(unit, pivot, Angle.CLOCK_0)) {
-            return false;
+            gameInProgress = true;
+            debug();
         }
         currentUnit = unit;
         currentUnitPivot = pivot;
         currentAngle = Angle.CLOCK_0;
-        return true;
+        debug();
+    }
+
+    private void spawn() {
+        if (gameInProgress) {
+            int unitId = randomizer.next(units.size());
+            spawn(units.get(unitId));
+        } else {
+            LOGGER.warn("Game has ended");
+        }
     }
 
     private static List<Cell> getUnitCells(final Unit unit, final Cell pivot, final Angle angle) {
@@ -111,6 +124,7 @@ public class Board {
         }
         filled = newFilled;
         currentUnit = null;
+        spawn();
     }
 
     /**
@@ -119,6 +133,10 @@ public class Board {
      * @return false if locked
      */
     public boolean operate(final Command command) {
+        if (!gameInProgress) {
+            LOGGER.warn("Game has ended.");
+            return false;
+        }
         Cell newUnitPivot = new Cell(currentUnitPivot.x, currentUnitPivot.y);
         Angle newAngle = currentAngle;
         switch (command) {
@@ -151,14 +169,11 @@ public class Board {
         }
         currentUnitPivot = newUnitPivot;
         currentAngle = newAngle;
+        debug();
         return true;
     }
 
-    public boolean unitIsEmpty() {
-        return currentUnit == null;
-    }
-
-    public void debug() {
+    private void debug() {
         char[][] f = new char[width][height];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -181,14 +196,13 @@ public class Board {
             }
         }
 
-        final StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder("\n");
         if (currentUnitPivot != null) {
             final OriginalCell ocPivot = currentUnitPivot.toOriginalCell();
             if (ocPivot.x >= 0 && ocPivot.x < width && ocPivot.y >= 0 && ocPivot.y < height) {
                 f[ocPivot.x][ocPivot.y] = f[ocPivot.x][ocPivot.y] == '.' ? '~' : '@';
             } else {
-                sb.append("=======================\n");
-                sb.append(String.format("pivot: (%d, %d)\n", ocPivot.x, ocPivot.y));
+                LOGGER.debug(String.format("pivot: (%d, %d)\n", ocPivot.x, ocPivot.y));
             }
         }
 
@@ -202,10 +216,7 @@ public class Board {
             }
             sb.append('\n');
         }
-
-        System.err.println("=======================");
-        System.err.println(sb.toString());
-        System.err.println("=======================");
+        LOGGER.debug(sb.toString());
     }
 
     private Cell spawnVector(final Unit unit) {
@@ -265,6 +276,7 @@ public class Board {
                 gen.writeNumberField("y", value.currentUnitPivot.toOriginalCell().y);
                 gen.writeEndObject();
             }
+            gen.writeNumberField("randomSeed", value.randomizer.getSeed());
             gen.writeEndObject();
         }
     }
@@ -288,7 +300,8 @@ public class Board {
                 unitCells.add(cell);
             }
             final Cell pivot = new OriginalCell(root.get("pivot").get("x").asInt(), root.get("pivot").get("y").asInt()).toCell();
-            final Board ret = new Board(width, height, filled);
+            final Randomizer randomizer = new Randomizer(root.get("randomSeed").asInt());
+            final Board ret = new Board(width, height, null, randomizer, filled); // TODO units null
             final Unit unit = new Unit(FluentIterable.from(unitCells).transform(new Function<Cell, OriginalCell>() {
                 @Nullable
                 @Override

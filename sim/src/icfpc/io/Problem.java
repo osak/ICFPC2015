@@ -8,7 +8,7 @@ import java.util.ArrayList;
 /**
  * @author masata
  */
-public class Input {
+public class Problem {
     public int id;
     public ArrayList<Unit> units;
     public int width;

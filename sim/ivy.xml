@@ -5,5 +5,7 @@
         <dependency org="com.fasterxml.jackson.core" name="jackson-databind" rev="2.6.0"/>
         <dependency org="com.fasterxml.jackson.core" name="jackson-annotations" rev="2.6.0"/>
         <dependency org="com.google.guava" name="guava" rev="12.0"/>
+        <dependency org="commons-cli" name="commons-cli" rev="1.2"/>
+        <dependency org="log4j" name="log4j" rev="1.2.17"/>
     </dependencies>
 </ivy-module>

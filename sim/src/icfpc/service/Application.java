@@ -24,7 +24,7 @@ public class Application implements HttpHandler {
     public void handle(final HttpExchange httpExchange) throws IOException {
         try {
             final State state = OBJECT_MAPPER.readValue(httpExchange.getRequestBody(), State.class);
-            state.board.debug();
+            //state.board.debug();
             final boolean result = state.board.operate(Command.valueOf(state.command));
             final Headers responseHeaders = httpExchange.getResponseHeaders();
             responseHeaders.add("content-type", "application/json");
