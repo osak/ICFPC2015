@@ -59,6 +59,14 @@ public class Board {
         return !gameInProgress;
     }
 
+    public void violateRule() {
+        gameInProgress = false;
+        moveScore = 0;
+        powerScore = 0;
+        LOGGER.debug("ゲームは異常終了しました。");
+        debug();
+    }
+
     private void spawn(final Unit unit) {
         final Cell pivot = unit.pivot.toCell().plusVector(spawnVector(unit));
         if (spawnedUnitCount >= gameSettings.maxSources) {
