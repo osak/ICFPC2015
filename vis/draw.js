@@ -4,6 +4,7 @@
     var history;
     var boardIndex;
     var timer;
+    var settings;
     var HEX_SIZE = 20;
     var HEX_WIDTH = HEX_SIZE * Math.sqrt(3);
     var HEX_HEIGHT = HEX_SIZE * 1.5;
@@ -69,8 +70,10 @@
     }
 
     function drawBoard(board) {
-        var boardWidth = board.width * HEX_WIDTH + HEX_SIZE*3;
-        var boardHeight = board.height * HEX_WIDTH + HEX_SIZE*3;
+        var width = settings ? settings.width : board.width;
+        var height = settings ? settings.height : board.height;
+        var boardWidth = width * HEX_WIDTH + HEX_SIZE*3;
+        var boardHeight = height * HEX_WIDTH + HEX_SIZE*3;
         if($('#scale').prop('checked')) {
             canvas.width = CANVAS_ORIGINAL_DIM.width;
             canvas.height = CANVAS_ORIGINAL_DIM.height;
@@ -82,8 +85,8 @@
             ctx.scale(1, 1);
         }
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for(var r = 0; r < board.height; ++r) {
-            for(var c = 0; c < board.width; ++c) {
+        for(var r = 0; r < height; ++r) {
+            for(var c = 0; c < width; ++c) {
                 var drawPos = getDrawPosition({y: r, x: c});
                 drawEmptyCell(drawPos.x, drawPos.y);
             }
@@ -191,8 +194,11 @@
 
         // Setup simulator action
         $('#simulator').click(function() {
+            settings = undefined;
             var raw = $('#simulator-out').val();
-            eval('history = ' + raw);
+            eval('json  = ' + raw);
+            settings = json.settings;
+            history = json.boards;
             $('#max').text(history.length - 1);
             setBoardIndex(0);
         });
