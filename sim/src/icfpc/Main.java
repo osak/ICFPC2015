@@ -85,6 +85,10 @@ public class Main {
             }
             board.operate(cmd);
             simulatorResultWriter.write(board);
+
+            if (board.hasEnded()) {
+                break;
+            }
         }
         simulatorResultWriter.close();
     }

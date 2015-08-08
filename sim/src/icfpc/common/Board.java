@@ -14,6 +14,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import icfpc.random.Randomizer;
 import org.apache.log4j.Logger;
 
@@ -21,6 +23,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -45,6 +48,8 @@ public class Board {
     private int moveScore = 0;
     private int powerScore = 0;
     private int spawnedUnitCount = 0;
+    private boolean isNewUnit;
+    private Set<Set<Cell>> moveHistory;
     // TODO シングルゲームの設定みたいなクラスにまとめる
     // TODO そもそもボード以外の状態を切り分ける
 
@@ -52,7 +57,13 @@ public class Board {
         this.gameSettings = gameSettings;
         this.randomizer = randomizer;
         this.filled = new HashSet<>(filled);
+        this.prevClearedRows = 0;
+        this.moveScore = 0;
+        this.powerScore = 0;
+        this.moveHistory = Sets.newHashSet();
         spawn();
+        historyCheck();
+        this.isNewUnit = false;
     }
 
     public boolean hasEnded() {
@@ -180,6 +191,12 @@ public class Board {
             LOGGER.warn("Game has ended.");
             return false;
         }
+
+        if (isNewUnit) {
+            moveHistory = Sets.newHashSet();
+            isNewUnit = false;
+        }
+
         Cell newUnitPivot = new Cell(currentUnitPivot.x, currentUnitPivot.y);
         Angle newAngle = currentAngle;
         switch (command) {
@@ -213,11 +230,27 @@ public class Board {
         }
         if (!check(currentUnit, newUnitPivot, newAngle)) {
             lock();
+            isNewUnit = true;
             return false; // LOCKED!!
         }
         currentUnitPivot = newUnitPivot;
         currentAngle = newAngle;
         debug();
+
+        if (!historyCheck()) {
+            violateRule();
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean historyCheck() {
+        Set<Cell> cells = Sets.newHashSet(getUnitCells());
+        if (moveHistory.contains(cells)) {
+            return false;
+        }
+        moveHistory.add(cells);
         return true;
     }
 
@@ -327,7 +360,10 @@ public class Board {
             gen.writeNumberField("moveScore", value.moveScore);
             gen.writeNumberField("powerScore", value.powerScore);
             gen.writeNumberField("clearedRows", value.prevClearedRows);
-            gen.writeObjectField("settings", value.gameSettings);
+            gen.writeNumberField("width", value.gameSettings.width);
+            gen.writeNumberField("height", value.gameSettings.height);
+            gen.writeNumberField("maxSources", value.gameSettings.maxSources);
+            gen.writeObjectField("units", value.gameSettings.units);
             gen.writeEndObject();
         }
     }
