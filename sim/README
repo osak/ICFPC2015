@@ -1,0 +1,58 @@
+json の形式
+
+type cell = {
+	"x": int,
+	"y": int
+}
+
+=== Normal mode ===
+{
+	"settings": {
+		"width: int,
+		"height": int,
+		"units": array of {
+			"members": array of cell,
+			"pivot": cell
+		},
+		"maxSources": int
+	},
+	"boards": array of {
+		"fullCells": array of cell,
+		"unitCells": array of cell,
+		"pivot": cell,
+		"randomSeed": int,
+		"score": int,
+		"moveScore": int,
+		"powerScore": int,
+	},
+
+}
+
+=== Simple Mode ===
+{
+	"settings": { /* Normal mode と同じ */
+		"width: int,
+		"height": int,
+		"units": array of {
+			"members": array of cell,
+			"pivot": cell
+		},
+		"maxSources": int
+	},
+	"initialBoard": { /* Normal mode の boards の 1要素と同じ */
+		"fullCells": array of cell,
+		"unitCells": array of cell,
+		"pivot": cell,
+		"randomSeed": int,
+		"score": int,
+		"moveScore": int,
+		"powerScore": int,
+	},
+	"diffBoards": {
+		"a": array of cell /* 増える cells */
+		"d": array of cell /* 減る cells */
+		"u": array of cell /* Unit の cells */
+		"p": cell /* pivot */
+		"s": int /* スコア */
+	}
+}
