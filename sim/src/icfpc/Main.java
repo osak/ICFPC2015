@@ -66,7 +66,7 @@ public class Main {
         }
 
         final Randomizer randomizer = new Randomizer(problem.sourceSeeds.get(0));
-        final Board board = new Board(problem.width, problem.height, problem.units, randomizer, FluentIterable.from(problem.filled).transform(new Function<OriginalCell, Cell>() {
+        final Board board = new Board(problem.width, problem.height, problem.units, randomizer, problem.sourceLength, FluentIterable.from(problem.filled).transform(new Function<OriginalCell, Cell>() {
             @Nullable
             @Override
             public Cell apply(OriginalCell input) {

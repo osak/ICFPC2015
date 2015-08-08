@@ -34,6 +34,7 @@ public class Board {
     private final int width;
     private final int height;
     private final List<Unit> units;
+    private final int maxSources;
     private Set<Cell> filled;
     private Unit currentUnit;
     private Cell currentUnitPivot;
@@ -43,8 +44,11 @@ public class Board {
     private int prevClearedRows;
     private int moveScore;
     private int powerScore;
+    private int spawnedUnitCount = 0;
+    // TODO シングルゲームの設定みたいなクラスにまとめる
+    // TODO そもそもボード以外の状態を切り分ける
 
-    public Board(final int width, final int height, final List<Unit> units, final Randomizer randomizer, Collection<? extends Cell> filled) {
+    public Board(final int width, final int height, final List<Unit> units, final Randomizer randomizer, final int maxSources, Collection<? extends Cell> filled) {
         this.width = width;
         this.height = height;
         this.units = units;
@@ -53,6 +57,7 @@ public class Board {
         this.prevClearedRows = 0;
         this.moveScore = 0;
         this.powerScore = 0;
+        this.maxSources = maxSources;
         spawn();
     }
 
@@ -62,13 +67,20 @@ public class Board {
 
     private void spawn(final Unit unit) {
         final Cell pivot = unit.pivot.toCell().plusVector(spawnVector(unit));
+        if (spawnedUnitCount >= maxSources) {
+            gameInProgress = false;
+            LOGGER.debug("ゲームは終了しました。");
+            debug();
+        }
         if (!check(unit, pivot, Angle.CLOCK_0)) {
             gameInProgress = false;
+            LOGGER.debug("ゲームは終了しました。");
             debug();
         }
         currentUnit = unit;
         currentUnitPivot = pivot;
         currentAngle = Angle.CLOCK_0;
+        spawnedUnitCount += 1;
         debug();
     }
 
@@ -310,6 +322,7 @@ public class Board {
             gen.writeNumberField("moveScore", value.moveScore);
             gen.writeNumberField("powerScore", value.powerScore);
             gen.writeNumberField("clearedRows", value.prevClearedRows);
+            gen.writeNumberField("maxSources", value.maxSources);
             gen.writeEndObject();
         }
     }
@@ -320,6 +333,7 @@ public class Board {
             JsonNode root = p.getCodec().readTree(p);
             final int width = root.get("width").asInt();
             final int height = root.get("height").asInt();
+            final int maxSources = root.get("maxSources").asInt();
             final List<Cell> filled = new ArrayList<>();
             for (final Iterator<JsonNode> it = root.get("fullCells").elements(); it.hasNext(); ) {
                 final JsonNode node = it.next();
@@ -334,7 +348,7 @@ public class Board {
             }
             final Cell pivot = new OriginalCell(root.get("pivot").get("x").asInt(), root.get("pivot").get("y").asInt()).toCell();
             final Randomizer randomizer = new Randomizer(root.get("randomSeed").asInt());
-            final Board ret = new Board(width, height, null, randomizer, filled); // TODO units null
+            final Board ret = new Board(width, height, null, randomizer, maxSources, filled); // TODO units null
             final Unit unit = new Unit(FluentIterable.from(unitCells).transform(new Function<Cell, OriginalCell>() {
                 @Nullable
                 @Override
