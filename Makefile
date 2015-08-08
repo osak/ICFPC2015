@@ -18,7 +18,7 @@ summary/%: visdump/%
 	python src/python/summary.py $<
 
 visdump/%: output/%
-	mkdir -p vidsump
+	mkdir -p visdump
 	sim/run.py problems/$* output/$* > visdump/$* 2> /dev/null
 
 output/%: solution.exe
