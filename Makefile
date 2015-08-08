@@ -1,10 +1,10 @@
 default: solution.exe
 
-visdump: solution
+visdump-all: solution-all
 	mkdir -p visdump
 	python src/python/visdump.py sim/run.py problems output visdump
 
-submit: solution.exe
+submit-all: solution.exe
 	./play_icfp2015 -f problems/* | ./submit.py
 
 solution-with-debug: solution.exe
@@ -12,10 +12,13 @@ solution-with-debug: solution.exe
 	mkdir -p aidebug
 	python src/python/runner.py ./solution.exe problems output aidebug
 
-solution: solution.exe
+solution-all: solution.exe
 	mkdir -p output
 	mkdir -p aidebug
 	python src/python/runner.py ./solution.exe problems output
+
+summary/%: visdump/%
+	python src/python/summary.py $<
 
 visdump/%: output/%
 	sim/run.py problems/$* output/$* > visdump/$* 2> /dev/null
