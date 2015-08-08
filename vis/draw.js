@@ -154,10 +154,12 @@
     }
 
     var COMMAND_TABLE = {
-        104: 'MOVE_W',
-        106: 'MOVE_SW',
-        107: 'MOVE_SE',
-        108: 'MOVE_E'
+        106: 'MOVE_W',
+        107: 'MOVE_E',
+        110: 'MOVE_SW',
+        44:  'MOVE_SE',
+        117: 'C_CLOCK',
+        105: 'CLOCK'
     };
 
     function initGame() {
