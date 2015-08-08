@@ -1,35 +1,32 @@
 #!/usr/bin/env ruby
 
-require 'sinatra'
-require 'fileutils'
 require 'mongo'
-require 'slim'
-require 'pp'
+require 'json'
 
-Dir.chdir(File.dirname(__FILE__))
-if !File.exists?('uploads')
-  FileUtils.mkdir('uploads')
+client = Mongo::Client.new(['icfpc.osak.jp'], database: 'kadingel')
+
+workdir = ARGV[0]
+revision = ARGV[1]
+comment = ARGV[2]
+run_date_utc = ARGV[3]
+
+Dir.glob(File.join(workdir, 'output', '*.json')) do |filename|
+  json = JSON.parse(File.read(filename))
+  client[:output].insert_one(
+    raw: json,
+    revision: revision,
+    problemId: json.first['problemId'],
+    comment: comment,
+    runDateUtc: run_date_utc
+  )
 end
 
-def db
-  @client ||= Mongo::Client.new(['localhost'], database: 'kadingel')
-  @collection ||= @client[:submit]
-end
-
-get '/' do
-  slim :index
-end
-
-post '/upload' do
-  timestamp = Time.now
-  timestr = timestamp.strftime('%Y-%m-%d_%H%M%S')
-  pp params
-  filename_org = params['file'][:filename]
-  file = params['file'][:tempfile]
-  tag = params['tag']
-  filename = File.join('uploads', "#{timestr}-#{filename_org}")
-  FileUtils.mv(file, filename)
-  db.insert_one(_id: timestamp.to_i, filename: filename, tag: tag)
-  
-  redirect to('/')
+Dir.glob(File.join(workdir, 'visdump', '*.json')) do |filename|
+  problem_id = filename.match(/\d+/)[1].to_i
+  json = JSON.parse(File.read(filename))
+  client[:vis].insert_one(
+    raw: json,
+    revision: revision,
+    problemId: problem_id
+  )
 end
