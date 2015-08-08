@@ -5,7 +5,7 @@ visdump: solution
 	python src/python/visdump.py sim/run.py problems output visdump
 
 submit: solution.exe
-	./play_icfp2015 -f problems/* | ./submit.sh
+	./play_icfp2015 -f problems/* | ./submit.py
 
 solution-with-debug: solution.exe
 	mkdir -p output
