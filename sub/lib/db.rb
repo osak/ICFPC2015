@@ -6,7 +6,7 @@ module Ogawa
     end
 
     def read_post(from, to)
-      client[:leaderboard].find(_id: {'$gt': from, '$lt': to}).limit(30).each.map {|post|
+      client[:leaderboard].find(_id: {'$gt' => from, '$lt' => to}).limit(30).each.map {|post|
         Ogawa::Post.new(
           id: post['_id'],
           problem_id: post['problem_id'],
