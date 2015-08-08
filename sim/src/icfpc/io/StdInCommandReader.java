@@ -1,7 +1,5 @@
 package icfpc.io;
 
-import icfpc.common.Command;
-
 import java.util.Scanner;
 
 /**
@@ -16,10 +14,10 @@ public class StdInCommandReader implements CommandReader {
     }
 
     @Override
-    public Command next() {
+    public char next() {
         try {
             final String line = scanner.nextLine();
-            return Command.fromChar(line.charAt(0));
+            return line.charAt(0);
         } catch (Throwable t) {
             return next();
         }

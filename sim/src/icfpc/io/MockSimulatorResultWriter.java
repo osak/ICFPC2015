@@ -13,6 +13,11 @@ public class MockSimulatorResultWriter implements SimulatorResultWriter {
     }
 
     @Override
+    public void write(String fieldName, Object object) throws IOException {
+
+    }
+
+    @Override
     public void close() throws IOException {
     }
 }
