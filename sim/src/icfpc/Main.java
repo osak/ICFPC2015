@@ -95,8 +95,7 @@ public class Main {
             while (commandReader.hasNext()) {
                 final char cmd = commandReader.next();
                 if (board.hasEnded()) {
-                    board.violateRule();
-                    board.memo = "余分な命令";
+                    board.violateRule("余分な命令");
                     if (i == 0) {
                         simulatorResultWriter.write(board);
                     }

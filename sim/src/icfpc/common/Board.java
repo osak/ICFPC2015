@@ -85,7 +85,8 @@ public class Board {
         return spawnedUnitCount;
     }
 
-    public void violateRule() {
+    public void violateRule(final String memo) {
+        this.memo = memo;
         gameInProgress = false;
         moveScore = 0;
         powerScore = 0;
@@ -269,8 +270,7 @@ public class Board {
                 diff = null;
                 return true;
             case INVALID:
-                violateRule();
-                memo = "invalid move";
+                violateRule("invalid move");
                 diff = null;
                 return false;
             default:
@@ -288,8 +288,7 @@ public class Board {
             currentAngle = newAngle;
 
             if (!historyCheck()) {
-                violateRule();
-                memo = "same history";
+                violateRule("same history");
                 return false;
             }
 
