@@ -5,6 +5,7 @@ require 'net/http'
 require 'slim'
 require 'pp'
 require 'fileutils'
+require 'time'
 require_relative 'env'
 require_relative 'lib/post'
 require_relative 'lib/db'
@@ -41,9 +42,9 @@ post '/solution' do
     req.basic_auth '', API_TOKEN
     req.body = json_post.to_json
     pp req.body
-    #res = http.request(req)
+    res = http.request(req)
 
-    if true || res.header.is_a?(Net::HTTPCreated)
+    if res.header.is_a?(Net::HTTPCreated)
       db.write_post(Ogawa::Post.new(
         id: timestamp,
         solution: json_org,
@@ -59,6 +60,10 @@ post '/solution' do
 end
 
 get '/history' do
-  @posts = db.read_post
+  from = params['from'] && Time.strptime(params['from'], '%Y-%m-%d %H:%M:%S')
+  to = params['to'] && Time.strptime(params['to'], '%Y-%m-%d %H:%M:%S')
+  pp from
+  pp to
+  @posts = db.read_post(from.to_i, to.to_i)
   slim :list
 end

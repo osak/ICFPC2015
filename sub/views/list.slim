@@ -11,16 +11,17 @@ css:
   }
 html
   body
+    form method="GET"
+      input type="text" name="from" placeholder="From (YYYY-mm-dd HH:MM:SS)"
+      input type="text" name="to" placeholder="To (YYYY-mm-dd HH:MM:SS)"
+      input type="submit" value="submit"
     ul
-      - @posts.each do |post|
+      - @posts.sort_by{|p| p.problem_id}.each do |post|
         li
           table.post
             tr
               th Problem ID
               td= post.problem_id
-            tr
-              th Power
-              td= post.power
             tr
               th Score
               td= post.score
