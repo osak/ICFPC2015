@@ -16,7 +16,7 @@ public class SimpleBoardDiff {
     @JsonProperty("u")
     public final ArrayList<OriginalCell> unitCells;
     @JsonProperty("p")
-    public final Cell pivot;
+    public final OriginalCell pivot;
     @JsonProperty("s")
     public final int score;
 
@@ -29,7 +29,7 @@ public class SimpleBoardDiff {
         this.addFullCells = toOriginalCellList(addFullCells);
         this.delFullCells = toOriginalCellList(delFullCells);
         this.unitCells = toOriginalCellList(unitCells);
-        this.pivot = pivot;
+        this.pivot = pivot.toOriginalCell();
         this.score = score;
     }
 
