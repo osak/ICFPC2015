@@ -8,5 +8,6 @@
     <li> board API endpoint /akatsuki/board/problemId/seed/revision/turn/ example: <a href="/akatsuki{{ url_for('get_board', prob_id=0, seed=0, rev='cfbcfcbc4416fbd061594baf77ed5149f1553def', turn=1) }}">here</a> </li>
     <li> game API endpoint /akatsuki/game/problemId/seed/revision/ example: <a href="/akatsuki{{ url_for('get_game', prob_id=0, seed=0, rev='cfbcfcbc4416fbd061594baf77ed5149f1553def') }}">here</a> </li>
     <li> game API endpoint /akatsuki/game/problemId/seed/revision/from-to example: <a href="/akatsuki{{ url_for('get_partial_game', prob_id=0, seed=0, rev='cfbcfcbc4416fbd061594baf77ed5149f1553def', fr=0, to=2) }}">here</a> </li>
+    <li> output API endpoint /akatsuki/output/problemId/seed/revision/ example: <a href="/akatsuki{{ url_for('get_output', prob_id=0, seed=0, rev='cfbcfcbc4416fbd061594baf77ed5149f1553def') }}">here</a> </li>
 </ul>
 {% endblock %}
