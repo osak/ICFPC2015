@@ -236,6 +236,35 @@
                 $('#auto-button').text('Stop');
             }
         });
+        $('#dev-render').click(function() {
+            var rev = $('#revision').val();
+            var probid = parseInt($('#probid').val());
+            var seed = parseInt($('#seed').val());
+            var turn = parseInt($('#turn').val());
+            var url;
+            if(turn) {
+                url = '/akatsuki/board/' + probid + '/' + seed + '/' + rev + '/' + turn + '/';
+            } else {
+                url = '/akatsuki/game/' + probid + '/' + seed + '/' + rev + '/';
+            }
+
+            $.ajax({
+                url: url,
+                contentType: 'application/json',
+                method: 'GET'
+            }).done(function(obj) {
+                if(Array.isArray(obj)) {
+                    history = [];
+                    obj.forEach(function(o) {
+                        history.push(o.board);
+                    });
+                } else {
+                    history = [obj.board];
+                }
+                $('#max').text(history.length - 1);
+                setBoardIndex(0);
+            });
+        });
 
         initProblemSelector();
         initGame();
