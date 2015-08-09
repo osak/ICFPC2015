@@ -111,7 +111,7 @@
     function initProblemSelector() {
         // Setup problem list
         var selector = $('#problem-selector');
-        for(var i = 0; i <= 23; ++i) {
+        for(var i = 0; i <= 24; ++i) {
             selector.append($('<option value="' + i + '" name="problem-id">problem_' + i + '.json</option>'));
         }
 
