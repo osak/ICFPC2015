@@ -4,17 +4,18 @@ require 'mongo'
 require 'json'
 
 def log(s)
-  puts "[LOG] #{s}"
+  STDERR.puts "[LOG] #{s}"
 end
 
 def error(s)
-  puts "[ERROR] #{s}"
+  STDERR.puts "[ERROR] #{s}"
 end
 
 CHUNK_SIZE = 1000
 
 Mongo::Logger.logger.level = ::Logger::INFO
-client = Mongo::Client.new(['172.31.34.41'], database: 'kadingel')
+client = Mongo::Client.new(['172.31.40.118'], database: 'kadingel')
+#client = Mongo::Client.new(['localhost'], database: 'kadingel')
 
 workdir = ARGV[0]
 revision = ARGV[1]
@@ -23,7 +24,7 @@ run_date_utc = ARGV[3]
 
 (0..24).each do |probid|
   log "reading problem #{probid}"
-  visfile = File.join(workdir, 'visdump', "problem_#{probid}.json")
+  visfile = File.join(workdir, 'visdump-simple', "problem_#{probid}.json")
   outfile = File.join(workdir, 'output', "problem_#{probid}.json")
   if !File.exists?(visfile) || !File.exists?(outfile)
     error("skip #{probid} because of file absense")
@@ -32,36 +33,15 @@ run_date_utc = ARGV[3]
 
   log "loading visfile for #{probid}"
   vis_json = JSON.parse(File.read(visfile))
-  seed = vis_json['settings']['initialSeed']
-  score_dict = Hash.new
-  vis_json['boards'].each_slice(CHUNK_SIZE).with_index do |boards, i|
-    turn = CHUNK_SIZE * i
-    docs = boards.each_with_index.map {|board, j|
-      {
-        board: board,
-        revision: revision,
-        problemId: probid,
-        seed: seed,
-        turn: turn + j,
-      }
-    }
-    client[:vis].insert_many(docs)
-    score_dict[seed] = {
-      score: boards.last['score'],
-      moveScore: boards.last['moveScore'],
-      powerScore: boards.last['powerScore'],
-      clearedRows: boards.last['clearedRows']
-    }
-  end
+  seed = vis_json['settings']['randomSeed']
+  score = vis_json['diffBoards'].last['s']
+  client[:vis].insert_one(vis_json)
 
   log "loading outfile for #{probid}"
   output_json = JSON.parse(File.read(outfile))
   output_json.each do |out|
-    score_spec = score_dict[out['seed'].to_i]
-    if score_spec
-      score_spec.each do |k, v|
-        out[k.to_s] = v
-      end
+    if seed == out['initialSeed']
+      out['score'] = score
     end
     out['revision'] = revision
     out['problemId'] = probid
