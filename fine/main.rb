@@ -22,8 +22,12 @@ workdir = ARGV[0]
 revision = ARGV[1]
 comment = ARGV[2]
 run_date_utc = ARGV[3]
+target_prob = ARGV[4] && ARGV[4].to_i
 
 (0..24).each do |probid|
+  if target_prob && probid != target_prob
+    next
+  end
   log "reading problem #{probid}"
   visfile = File.join(workdir, 'visdump-simple', "problem_#{probid}.json")
   outfile = File.join(workdir, 'output', "problem_#{probid}.json")
