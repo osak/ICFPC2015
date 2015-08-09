@@ -24,10 +24,12 @@
     <table class="table">
         <thead>
         <tr>
+            <th>Date</th>
             <th>Comment</th>
             <th>Problem ID</th>
             <th>Seed</th>
             <th>Score</th>
+            <th>RunTime</th>
             <th>Output</th>
             <th>Visualizer</th>
         </tr>
@@ -35,10 +37,12 @@
         <tbody>
         {% for output in outputs %}
         <tr class="tableRow" comment="{{ output['comment'] }}" problemid="{{ output['problemId'] }}" seed="{{ output['seed'] }}">
+            <td>{{ output['runDateString'] }}</td>
             <td>{{ output['comment'] }}</td>
             <td>{{ output['problemId'] }}</td>
             <td>{{ output['seed'] }}</td>
             <td>{{ output['score'] }}</td>
+            <td>{{ output['elapsedTime'] }}</td>
             <td><a href="{{ output['outputUrl'] }}">Output</a></td>
             <td><a href="{{ output['visualizerUrl'] }}">Visualizer</a></td>
         </tr>

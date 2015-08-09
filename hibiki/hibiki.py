@@ -5,6 +5,8 @@ from flask import Flask, render_template
 import pymongo
 from config import MONGO_URI, HIBIKI_HOST, HIBIKI_PORT
 import logging
+import time
+import datetime
 
 
 logger = logging.getLogger('hibiki')
@@ -15,14 +17,14 @@ def get_all_output():
     client = pymongo.MongoClient(MONGO_URI)
     logger.info('collect all output.')
     cursor = client.kadingel.output.find(projection={'_id': False})
-    documents = list(cursor.sort([('revision', pymongo.ASCENDING), ('problemId', pymongo.ASCENDING), ('seed', pymongo.ASCENDING)]))
+    documents = list(cursor.sort([('revision', pymongo.DESCENDING), ('problemId', pymongo.ASCENDING), ('seed', pymongo.ASCENDING)]))
     client.close()
 
     # filter duplicated docs
     result = []
     used_tuple = set()
     for document in documents:
-        tup = (document['revision'], document['problemId'], document['seed'])
+        tup = (document['runDateUtc'], document['problemId'], document['seed'])
         if tup not in used_tuple:
             result.append(document)
             used_tuple.add(tup)
@@ -37,6 +39,9 @@ def index():
     for output in outputs:
         output['outputUrl'] = output_base_url.format(api='output', **output)
         output['visualizerUrl'] = visualiser_base_url.format(api='game', **output)
+        datetime_obj = datetime.datetime.fromtimestamp(int(output['runDateUtc']))
+        output['runDateString'] = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
+        output['elapsedTime'] = '{:0.3f}'.format(output['elapsedTime'])
     return render_template('index.html',
                            outputs=outputs)
 
