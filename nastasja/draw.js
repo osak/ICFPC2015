@@ -100,46 +100,7 @@
             var drawPos = getDrawPosition(game.diffBoards[boardIndex]['p']);
             drawPivot(drawPos.x, drawPos.y);
         }
-        $('#score').text(board.diffBoards[boardIndex]['s']);
-    }
-
-    function initProblemSelector() {
-        // Setup problem list
-        var selector = $('#problem-selector');
-        for(var i = 0; i <= 23; ++i) {
-            selector.append($('<option value="' + i + '" name="problem-id">problem_' + i + '.json</option>'));
-        }
-
-        selector.change(function() {
-            var id = $('#problem-selector').val();
-            $.ajax({
-                url: '/sakimori/problems/problem_' + id + '.json',
-                contentType: 'text/json'
-            }).done(function(obj) {
-                init = {
-                    height: obj.height,
-                    width: obj.width,
-                    fullCells: obj.filled
-                };
-                history = [];
-                history.push(init);
-                obj.units.forEach(function(e) {
-                    var width = 0, height = 0;
-                    e.members.forEach(function(m) {
-                        width = Math.max(width, m.x+1);
-                        height = Math.max(height, m.y+1);
-                    });
-                    history.push({
-                        width: width,
-                        height: height,
-                        fullCells: e.members,
-                        pivot: e.pivot
-                    });
-                });
-                $('#max').text(history.length - 1);
-                setBoardIndex(0);
-            });
-        });
+        $('#score').text(game.diffBoards[boardIndex]['s']);
     }
 
     function clearField() {
@@ -153,7 +114,7 @@
     }
 
     function simulate(to) {
-        var start = (boardIndex <= to) ? baordIndex+1 : 0;
+        var start = (boardIndex <= to) ? boardIndex+1 : 0;
         if(start == 0) {
             clearField();
         }
@@ -170,7 +131,7 @@
     }
 
     function setBoardIndex(index) {
-        if(index < 0 || index >= history.length) {
+        if(index < 0 || index >= game.diffBoards.length) {
             return false;
         }
         simulate(index);
@@ -180,43 +141,13 @@
         return true;
     }
 
-    var COMMAND_TABLE = {
-        106: 'MOVE_W',
-        107: 'MOVE_E',
-        110: 'MOVE_SW',
-        44:  'MOVE_SE',
-        117: 'C_CLOCK',
-        105: 'CLOCK'
-    };
-
-    function initGame() {
-        $('#canvas').keypress(function(e) {
-            var command = COMMAND_TABLE[e.charCode];
-            var board = history[boardIndex];
-            if(command) {
-                $.ajax({
-                    url: 'http://icfpc.osak.jp/miichan',
-                    contentType: 'application/json',
-                    method: 'POST',
-                    data: JSON.stringify({
-                        command: command,
-                        board: board
-                    })
-                }).done(function(res) {
-                    console.log(res);
-                    history[boardIndex] = res.Board;
-                    drawBoard(history[boardIndex]);
-                });
-            }
-        });
-    }
-
     function parseParameter() {
         var paramStr = window.location.search.substr(1);
         if(paramStr === null) return false;
         var params = paramStr.split('&');
         var revision, seed, problemId;
         params.forEach(function(param) {
+            console.log(param);
             var arr = param.split('=');
             if(arr[0] == 'revision') {
                 revision = arr[1];
@@ -227,11 +158,14 @@
             }
         });
         $.ajax({
-            url: '/akatsuki/game/' + problemId + '/' + seed + '/' + revision,
+            url: '/akatsuki/game/' + problemId + '/' + seed + '/' + revision + '/',
             contentType: 'application/json',
             method: 'GET'
         }).done(function(obj) {
             game = obj;
+            $('#max').text(game.diffBoards.length - 1);
+            setBoardIndex(0);
+            drawBoard();
         });
     }
 
@@ -273,7 +207,7 @@
                 var wait = parseInt($('#auto-wait').val());
                 timer = setInterval(function() {
                     if(setBoardIndex(boardIndex + 1)) {
-                        drawBoard(history[boardIndex]);
+                        drawBoard();
                     } else {
                         clearInterval(timer);
                         timer = undefined;
@@ -313,8 +247,6 @@
             });
         });
 
-        initProblemSelector();
-        initGame();
         parseParameter();
     });
 })();
