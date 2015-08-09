@@ -17,7 +17,9 @@
             <tr>
                 <td>{{ prob_id }}</td>
                 {% for rev in revs %}
-                <td {% if best[prob_id] is equalto summary[prob_id][rev] %}class="success"{% endif %}>{{ summary[prob_id][rev] }}</td>
+                <td {% if best[prob_id] is equalto summary[prob_id][rev] %}class="success"{% endif %}>
+                    {{ summary[prob_id][rev] }} ({{ runtime[prob_id][rev] }})
+                </td>
                 {% endfor %}
             </tr>
             {% endfor %}

@@ -52,7 +52,7 @@ def get_submission_scores(revs, poyo, allrevs=False):
 
     used_tuple = set()
     revset = set(revs)
-    summary, names = dict(), dict()
+    summary, names, runtime = dict(), dict(), dict()
     for document in documents:
         tup = (document['revision'], document['problemId'], document['seed'])
         if tup not in used_tuple:
@@ -60,9 +60,12 @@ def get_submission_scores(revs, poyo, allrevs=False):
             rev, prob_id, seed = tup
             if prob_id not in summary:
                 summary[prob_id] = dict()
+                runtime[prob_id] = dict()
             if rev not in summary[prob_id]:
                 summary[prob_id][rev] = []
+                runtime[prob_id][rev] = []
             summary[prob_id][rev].append(document['score'])
+            runtime[prob_id][rev].append(document['elapsedTime'])
             names[rev] = document['comment']
     if poyo:
         revset.add('poyo')
@@ -70,6 +73,7 @@ def get_submission_scores(revs, poyo, allrevs=False):
         for prob_id, score in get_poyo_score().items():
             if prob_id not in summary:
                 summary[prob_id] = dict()
+                runtime[prob_id] = dict()
             summary[prob_id]['poyo'] = [score]
 
     best = dict()
@@ -80,8 +84,14 @@ def get_submission_scores(revs, poyo, allrevs=False):
             if rev not in row:
                 row[rev] = 0
         best[prob_id] = max(row.values())
+    for prob_id, row in runtime.items():
+        for rev, times in row.items():
+            row[rev] = '{:0.3f}'.format(sum(times) / len(times))
+        for rev in revs + ['poyo']:
+            if rev not in row:
+                row[rev] = '----'
 
-    return summary, names, best, documents
+    return summary, names, best, documents, runtime
 
 
 def get_submission_data(bestrev):
@@ -128,7 +138,7 @@ def submission():
         logger.info("submission data length = {}".format(len(submission_data)))
         context["message"] = "Success!" if submit_data(submission_data) else "Failure..."
         # fall through to get proessing
-    summary, names, best, docs = get_submission_scores([], False, allrevs=True)
+    summary, names, best, docs, runtime = get_submission_scores([], False, allrevs=True)
     bestrev = dict()
     bestscore = dict()
     for prob_id in summary:
@@ -146,8 +156,8 @@ def compare():
     else:
         revs = []
     poyo = bool(request.args.get('poyo'))
-    summary, names, best, docs = get_submission_scores(revs, poyo)
-    return render_template('compare.html', revs=names.keys(), names=names, problems=summary.keys(), summary=summary, best=best)
+    summary, names, best, docs, runtime = get_submission_scores(revs, poyo)
+    return render_template('compare.html', revs=names.keys(), names=names, problems=summary.keys(), summary=summary, best=best, runtime=runtime)
 
 
 def get_all_output(query=None):
