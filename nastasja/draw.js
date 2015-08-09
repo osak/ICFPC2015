@@ -111,6 +111,9 @@
                 field[y].push(0);
             }
         }
+        game.initialBoard.fullCells.forEach(function(pos) {
+            field[pos.y][pos.x] = 1;
+        });
     }
 
     function simulate(to) {
