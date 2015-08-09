@@ -97,6 +97,9 @@ public class CommandLineOption extends Options {
         if (cl.hasOption("a")) {
             builder.answerFile(cl.getOptionValue("a"));
         }
+        if (cl.hasOption("A")) {
+            builder.allMode(true);
+        }
         return builder.build();
     }
 
@@ -113,6 +116,7 @@ public class CommandLineOption extends Options {
     public static class Builder {
         private Mode mode = Mode.NORMAL;
         private boolean debugMode = false;
+        private boolean allMode = false;
         private URL problemFile;
         private URL answerFile;
 
@@ -132,6 +136,10 @@ public class CommandLineOption extends Options {
         }
         public Builder debugMode(final boolean debugMode) {
             this.debugMode = debugMode;
+            return this;
+        }
+        public Builder allMode(final boolean allMode) {
+            this.allMode = allMode;
             return this;
         }
         public Builder problemFile(final String problemFilePath) {
@@ -161,23 +169,23 @@ public class CommandLineOption extends Options {
                         debugMode,
                         MAPPER.readValue(problemFile, Problem.class),
                         answers,
-                        makeDumpWriter(mode));
+                        makeDumpWriter(mode, allMode));
             } else {
                 return new CommandLineOption(
                         mode,
                         debugMode,
                         MAPPER.readValue(problemFile, Problem.class),
                         null,
-                        makeDumpWriter(mode));
+                        makeDumpWriter(mode, allMode));
             }
         }
 
-        private static SimulatorDumpWriter makeDumpWriter(final Mode mode) {
+        private static SimulatorDumpWriter makeDumpWriter(final Mode mode, final boolean allMode) {
             switch (mode) {
                 case NORMAL:
-                    return new DefaultSimulatorDumpWriter(System.out);
+                    return new DefaultSimulatorDumpWriter(System.out, allMode);
                 case SIMPLE:
-                    return new SimpleSimulatorDumpWriter(System.out);
+                    return new SimpleSimulatorDumpWriter(System.out, allMode);
                 default:
                     return new MockSimulatorDumpWriter();
             }
@@ -194,6 +202,7 @@ public class CommandLineOption extends Options {
             addOption("d", false, "log4j.level=DEBUG");
             addOption("p", "problem", true, "Problem file");
             addOption("a", "answer", true, "AI output file");
+            addOption("A", "all", false, "Output all results");
         }
     }
 }

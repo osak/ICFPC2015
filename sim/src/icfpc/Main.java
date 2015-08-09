@@ -1,6 +1,5 @@
 package icfpc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import icfpc.cli.CommandLineOption;
@@ -27,7 +26,6 @@ import java.util.List;
  */
 public class Main {
     private static final Logger LOGGER = Logger.getLogger(Main.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public static void main(final String[] args) throws Exception {
         setLogger();
@@ -54,6 +52,7 @@ public class Main {
             }
         }).toImmutableList();
 
+        final SimulatorDumpWriter simulatorDumpWriter = opts.getDumpWriter();
         final int n = problem.sourceSeeds.size();
         int sumScore = 0;
         int sumSpawn = 0;
@@ -61,7 +60,6 @@ public class Main {
         int alive = 0;
         for (int i = 0; i < n; i++) {
             final int seed = problem.sourceSeeds.get(i);
-            final SimulatorDumpWriter simulatorDumpWriter = opts.getDumpWriter();
             final GameSettings gameSettings = new GameSettings(problem.width, problem.height, problem.units, problem.sourceLength, seed);
             final CommandReader commandReader;
             if (opts.getMode() == CommandLineOption.Mode.INTERACTIVE) {
@@ -75,14 +73,13 @@ public class Main {
                 commandReader = answer.getCommandReader();
                 simulatorDumpWriter.write("expectedScore", answer.expectedScore);
                 sumElapsedTime += answer.elapsedTime;
+                simulatorDumpWriter.write("elapsedTime", answer.elapsedTime);
             }
 
             final Randomizer randomizer = new Randomizer(seed);
             final Board board = new Board(gameSettings, randomizer, cellFilled);
             simulatorDumpWriter.begin(board);
-            if (i == 0) {
-                simulatorDumpWriter.write(board);
-            }
+            simulatorDumpWriter.write(board);
             while (commandReader.hasNext()) {
                 final char cmd = commandReader.next();
                 if (board.hasEnded()) {
@@ -105,18 +102,18 @@ public class Main {
                 }
             }
             sumScore += board.getScore();
+            simulatorDumpWriter.write("score", board.getScore());
             sumSpawn += board.getSpawnedUnitCount();
-            if (i == 0) {
-                simulatorDumpWriter.write("SampleScore", board.getScore());
-            }
+            simulatorDumpWriter.write("spawnCount", board.getSpawnedUnitCount());
             if (board.getSpawnedUnitCount() == problem.sourceLength) {
                 alive++;
             }
             if (board.memo != null) {
                 simulatorDumpWriter.write("memo", board.memo);
             }
-            simulatorDumpWriter.close();
+            simulatorDumpWriter.end();
         }
+        simulatorDumpWriter.close();
         LOGGER.info("averageScore: " + sumScore / n);
         LOGGER.info("averageElapsedTime: " + sumElapsedTime / n);
         LOGGER.info("aliveCount: " + alive);

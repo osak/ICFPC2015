@@ -15,25 +15,37 @@ public class DefaultSimulatorDumpWriter implements SimulatorDumpWriter {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     private final OutputStream outputStream;
-    private boolean firstElement;
+    private boolean firstBoard;
+    private boolean firstTest;
+    private final boolean allMode;
     private Map<String, Object> appendix = new HashMap<>();
 
-    public DefaultSimulatorDumpWriter(final OutputStream outputStream) {
+    public DefaultSimulatorDumpWriter(final OutputStream outputStream, final boolean allMode) {
         this.outputStream = outputStream;
-        this.firstElement = true;
+        this.allMode = allMode;
     }
 
     @Override
     public void begin(Board board) throws IOException {
+        if (allMode) {
+            outputStream.write("[".getBytes());
+            if (firstTest) {
+                firstTest = false;
+            } else {
+                outputStream.write("],".getBytes());
+            }
+            firstBoard = true;
+            outputStream.write("[".getBytes());
+        }
         outputStream.write(String.format("{\"settings\": %s, \"boards\": [\n", mapper.writeValueAsString(board.getGameSettings())).getBytes());
     }
 
     @Override
     public void write(final Board board) throws IOException {
-        if (!firstElement) {
+        if (!firstBoard) {
             outputStream.write(",".getBytes());
         }
-        firstElement = false;
+        firstBoard = false;
         outputStream.write(mapper.writeValueAsString(board).getBytes());
         outputStream.write("\n".getBytes());
     }
@@ -44,12 +56,19 @@ public class DefaultSimulatorDumpWriter implements SimulatorDumpWriter {
     }
 
     @Override
-    public void close() throws IOException {
+    public void end() throws IOException {
         outputStream.write("]".getBytes());
         for (final Map.Entry<String, Object> entry : appendix.entrySet()) {
             outputStream.write(String.format("\n, \"%s\": %s", entry.getKey(), mapper.writeValueAsString(entry.getValue())).getBytes());
         }
         outputStream.write("}".getBytes());
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (allMode) {
+            outputStream.write("]".getBytes());
+        }
         outputStream.close();
     }
 }

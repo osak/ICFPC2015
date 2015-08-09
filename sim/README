@@ -1,5 +1,7 @@
 json の形式
 
+All mode が On の場合、全体が array になります。
+
 type cell = {
 	"x": int,
 	"y": int
@@ -25,7 +27,10 @@ type cell = {
 		"moveScore": int,
 		"powerScore": int,
 	},
-
+	"expectedScore": int,
+	"score": int,
+	"spawnCount": int,
+	"elapsedTime": double
 }
 
 === Simple Mode ===
@@ -54,5 +59,9 @@ type cell = {
 		"u": array of cell /* Unit の cells */
 		"p": cell /* pivot */
 		"s": int /* スコア */
-	}
+	},
+	"expectedScore": int,
+	"score": int,
+	"spawnCount": int,
+	"elapsedTime": double
 }
