@@ -1,0 +1,53 @@
+<html>
+    <head>
+        <script type="text/javascript" src="jquery.min.js"></script>
+        <script type="text/javascript" src="draw.js"></script>
+        <style type="text/css">
+        h2 { margin-top: 0; }
+        </style>
+    </head>
+    <body>
+        <h1>Sakimori</h1>
+        <div style="display: flex">
+            <div>
+                <div style="text-align: left;">
+                    Score: <span id="score"></span>
+                </div>
+                <div style="text-align: center;">
+                    <button id="prev-button">&lt;</button>
+                    <input id="current-state" type="text" style="width: 40px;"> / <span id="max"></span>
+                    <button id="next-button">&gt;</button>
+                    <div style="margin-left: 10px; display: inline-block;">
+                        <button id="auto-button">Auto</button>
+                        <input id="auto-wait" style="width: 40px;" placeholder="Wait(ms)" value="17"> ms
+                    </div>
+                </div>
+                <div id="canvas-wrapper">
+                    <canvas id="canvas" width="800" height="500" style="border: 1px solid black;" tabindex="1"></canvas>
+                </div>
+            </div>
+            <div style="margin-left: 10px;">
+                <div>
+                    <input id="scale" type="checkbox" name="scale" checked><label for="scale">Scale</label>
+                </div>
+                <div>
+                    <h2>Simulator output visualize</h2>
+                    <textarea id="simulator-out" placeholder="Simulator Output"></textarea><br>
+                    <button id="simulator">Load</button>
+                <div>
+                <div style="margin-top: 20px;">
+                    <h2>Show initial state</h2>
+                    <select id="problem-selector"></select>
+                </div>
+                <div style="margin-top: 20px;">
+                    <h2>Developer tools</h2>
+                    <input type="text" id="revision" placeholder="revision"><br>
+                    <input type="text" id="probid" placeholder="probid"><br>
+                    <input type="text" id="seed" placeholder="seed"><br>
+                    <input type="text" id="turn" placeholder="turn"><br>
+                    <button id="dev-render">Load</button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

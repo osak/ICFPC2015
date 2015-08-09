@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns:ivy="antlib:org.apache.ivy.ant"  name="foo" default="jar" basedir=".">
+    <property name="build.src" value="src"/>
+    <property name="build.dest" value="build"/>
+    <property name="src.resources" value="resources"/>
+    <property name="project" value="icfpc-ema"/>
+    <property name="version" value="1.0"/>
+    <property name="build.jar" value="ema.jar"/>
+    <property name="lib.dir" value="lib/"/>
+
+    <target name="jar" depends="compile, resources">
+        <jar
+                jarfile="${build.jar}"
+                basedir="${build.dest}">
+            <manifest>
+                <attribute name="Main-Class" value="icfpc.ema.Main"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <path id="classpath">
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+        <path location="${src.resources}" />
+    </path>
+
+    <target name="compile" depends="resolve">
+        <mkdir dir="${build.dest}" />
+        <javac srcdir="${build.src}"
+               destdir="${build.dest}"
+               classpathref="classpath"
+                />
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.dest}" />
+        <delete file="${build.jar}" />
+    </target>
+
+    <target name="resources">
+        <copy todir="${build.dest}">
+            <fileset dir="${src.resources}"/>
+        </copy>
+    </target>
+
+    <target name="resolve" description="--> retreive dependencies with ivy">
+        <ivy:retrieve/>
+    </target>
+
+</project>

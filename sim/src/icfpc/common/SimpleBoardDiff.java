@@ -10,11 +10,11 @@ import java.util.Collection;
  */
 public class SimpleBoardDiff {
     @JsonProperty("a")
-    public final ArrayList<Cell> addFullCells;
+    public final ArrayList<OriginalCell> addFullCells;
     @JsonProperty("d")
-    public final ArrayList<Cell> delFullCells;
+    public final ArrayList<OriginalCell> delFullCells;
     @JsonProperty("u")
-    public final ArrayList<Cell> unitCells;
+    public final ArrayList<OriginalCell> unitCells;
     @JsonProperty("p")
     public final Cell pivot;
     @JsonProperty("s")
@@ -26,10 +26,18 @@ public class SimpleBoardDiff {
             final Collection<? extends Cell> unitCells,
             final Cell pivot,
             final int score) {
-        this.addFullCells = new ArrayList<>(addFullCells);
-        this.delFullCells = new ArrayList<>(delFullCells);
-        this.unitCells = new ArrayList<>(unitCells);
+        this.addFullCells = toOriginalCellList(addFullCells);
+        this.delFullCells = toOriginalCellList(delFullCells);
+        this.unitCells = toOriginalCellList(unitCells);
         this.pivot = pivot;
         this.score = score;
+    }
+
+    private static ArrayList<OriginalCell> toOriginalCellList(final Collection<? extends Cell> cells) {
+        final ArrayList<OriginalCell> ret = new ArrayList<>();
+        for (final  Cell cell : cells) {
+            ret.add(cell.toOriginalCell());
+        }
+        return ret;
     }
 }
