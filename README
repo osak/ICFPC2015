@@ -7,3 +7,50 @@ following:
   * Change `beamWidth` parameter in ai.cpp:13 to 2000.
   * Compile it.
   * Run on problem 23 and see how he does.
+
+
+Product List
+ * AI
+  This AI consists of several sub-AIs which handle different situations to make up their weakness mutually.
+  * God
+   [describe here]
+  * Buddha
+   [describe here]
+  * Master
+   [describe here]
+  * Random
+   [describe here]
+  * Daisaku
+   Command optimizer works in post-processing
+
+ * akatsuki
+  mongodb API endpoint.
+
+ * ema
+  Detect phrase of power automatically using official score board.
+
+ * fine
+  Write a AI outputs into mongodb from Jenkins.
+
+ * hibiki
+  AI output manager webapp.
+
+ * leaderboard_watcher
+  Its name describes exactly what he does.
+
+ * nastasja
+  Game visualizer integrated with mongodb (akatsuki API).
+
+ * ogawa
+  Proxy server for submission. submission is saved simultaneously.
+
+ * sakimori
+  Game visualizer used in initial stage of this contest.
+
+ * sim
+  Game simulator
+
+ * src
+  Miscellaneous scripts
+
+
