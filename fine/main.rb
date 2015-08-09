@@ -45,7 +45,7 @@ run_date_utc = ARGV[3]
   log "loading outfile for #{probid}"
   output_json = JSON.parse(File.read(outfile))
   output_json.each do |out|
-    if seed == out['initialSeed']
+    if seed == out['seed']
       out['score'] = score
     end
     out['revision'] = revision
