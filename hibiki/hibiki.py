@@ -195,7 +195,7 @@ def viewall():
 
 @app.route("/")
 def index():
-    return render_output_table_page({'problemId': 0, 'seed': 0}, 'viewall.html')
+    return render_output_table_page({'problemId': 0, 'seed': 0}, 'index.html')
 
 
 if __name__ == "__main__":
