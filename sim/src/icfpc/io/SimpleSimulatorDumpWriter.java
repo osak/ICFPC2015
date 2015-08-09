@@ -18,18 +18,30 @@ public class SimpleSimulatorDumpWriter implements SimulatorDumpWriter {
     private static final Logger LOGGER = Logger.getLogger(SimpleSimulatorDumpWriter.class);
 
     private final OutputStream outputStream;
-    private boolean firstElement;
+    private boolean firstBoard = true;
+    private boolean firstTest = true;
     private Map<String, Object> appendix = new HashMap<>();
+    private final boolean allMode;
 
-    public SimpleSimulatorDumpWriter(final OutputStream outputStream) {
+    public SimpleSimulatorDumpWriter(final OutputStream outputStream, final boolean allMode) {
         this.outputStream = outputStream;
-        this.firstElement = true;
+        this.allMode = allMode;
     }
 
     @Override
     public void begin(Board board) throws IOException {
+        if (allMode) {
+            if (firstTest) {
+                outputStream.write("[".getBytes());
+                firstTest = false;
+            } else {
+                outputStream.write(",".getBytes());
+            }
+            firstBoard = true;
+        }
         outputStream.write(String.format(
                 "{\"settings\": %s, \"initialBoard\": %s, \"diffBoards\": [\n",
+
                 MAPPER.writeValueAsString(board.getGameSettings()),
                 MAPPER.writeValueAsString(board)
         ).getBytes());
@@ -42,10 +54,10 @@ public class SimpleSimulatorDumpWriter implements SimulatorDumpWriter {
             LOGGER.debug("no diff");
             return;
         }
-        if (!firstElement) {
+        if (!firstBoard) {
             outputStream.write(",".getBytes());
         }
-        firstElement = false;
+        firstBoard = false;
         outputStream.write(MAPPER.writeValueAsString(diff).getBytes());
         outputStream.write("\n".getBytes());
     }
@@ -56,12 +68,19 @@ public class SimpleSimulatorDumpWriter implements SimulatorDumpWriter {
     }
 
     @Override
-    public void close() throws IOException {
+    public void end() throws IOException {
         outputStream.write("]".getBytes());
         for (final Map.Entry<String, Object> entry : appendix.entrySet()) {
             outputStream.write(String.format("\n, \"%s\": %s", entry.getKey(), MAPPER.writeValueAsString(entry.getValue())).getBytes());
         }
         outputStream.write("}".getBytes());
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (allMode) {
+            outputStream.write("]".getBytes());
+        }
         outputStream.close();
     }
 }

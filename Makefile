@@ -2,6 +2,7 @@ OUTPUT_ALL = output/problem_0.json output/problem_1.json output/problem_2.json o
 VISDUMP_ALL = visdump/problem_0.json visdump/problem_1.json visdump/problem_2.json visdump/problem_3.json visdump/problem_4.json visdump/problem_5.json visdump/problem_6.json visdump/problem_7.json visdump/problem_8.json visdump/problem_9.json visdump/problem_10.json visdump/problem_11.json visdump/problem_12.json visdump/problem_13.json visdump/problem_14.json visdump/problem_15.json visdump/problem_16.json visdump/problem_17.json visdump/problem_18.json visdump/problem_19.json visdump/problem_20.json visdump/problem_21.json visdump/problem_22.json visdump/problem_23.json visdump/problem_24.json
 VISDUMP_SIMPLE_ALL = visdump-simple/problem_0.json visdump-simple/problem_1.json visdump-simple/problem_2.json visdump-simple/problem_3.json visdump-simple/problem_4.json visdump-simple/problem_5.json visdump-simple/problem_6.json visdump-simple/problem_7.json visdump-simple/problem_8.json visdump-simple/problem_9.json visdump-simple/problem_10.json visdump-simple/problem_11.json visdump-simple/problem_12.json visdump-simple/problem_13.json visdump-simple/problem_14.json visdump-simple/problem_15.json visdump-simple/problem_16.json visdump-simple/problem_17.json visdump-simple/problem_18.json visdump-simple/problem_19.json visdump-simple/problem_20.json visdump-simple/problem_21.json visdump-simple/problem_22.json visdump-simple/problem_23.json visdump-simple/problem_24.json
 VISDUMP_SIMPLE_FAST = visdump-simple/problem_0.json visdump-simple/problem_1.json visdump-simple/problem_2.json visdump-simple/problem_3.json visdump-simple/problem_4.json visdump-simple/problem_5.json visdump-simple/problem_6.json visdump-simple/problem_7.json visdump-simple/problem_8.json visdump-simple/problem_9.json visdump-simple/problem_10.json visdump-simple/problem_11.json visdump-simple/problem_12.json visdump-simple/problem_13.json visdump-simple/problem_15.json visdump-simple/problem_16.json visdump-simple/problem_17.json visdump-simple/problem_18.json visdump-simple/problem_19.json visdump-simple/problem_20.json visdump-simple/problem_21.json visdump-simple/problem_22.json visdump-simple/problem_23.json
+VISDUMP_SIMPLE_HEAVY = visdump-simple/problem_14.json visdump-simple/problem_24.json
 SUBMIT_ALL = submit/problem_0.json submit/problem_1.json submit/problem_2.json submit/problem_3.json submit/problem_4.json submit/problem_5.json submit/problem_6.json submit/problem_7.json submit/problem_8.json submit/problem_9.json submit/problem_10.json submit/problem_11.json submit/problem_12.json submit/problem_13.json submit/problem_14.json submit/problem_15.json submit/problem_16.json submit/problem_17.json submit/problem_18.json submit/problem_19.json submit/problem_20.json submit/problem_21.json submit/problem_22.json submit/problem_23.json submit/problem_24.json
 
 default: solution.exe
@@ -9,6 +10,7 @@ default: solution.exe
 visdump-all: $(VISDUMP_ALL)
 visdump-simple-all: $(VISDUMP_SIMPLE_ALL)
 visdump-simple-fast: $(VISDUMP_SIMPLE_FAST)
+visdump-simple-heavy: $(VISDUMP_SIMPLE_HEAVY)
 
 solution-all: output-all
 output-all: $(OUTPUT_ALL)
