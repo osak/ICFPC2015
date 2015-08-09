@@ -32,10 +32,11 @@ def get_all_output():
 @app.route("/")
 def index():
     outputs = get_all_output()
-    base_url = 'http://icfpc.osak.jp/akatsuki/{api}/{problemId}/{seed}/{revision}/'
+    output_base_url = 'http://icfpc.osak.jp/akatsuki/{api}/{problemId}/{seed}/{revision}/'
+    visualiser_base_url = 'http://icfpc.osak.jp/nastasja/index.html?revision={revision}&problemId={problemId}&seed={seed}'
     for output in outputs:
-        output['outputUrl'] = base_url.format(api='output', **output)
-        output['visdumpUrl'] = base_url.format(api='game', **output)
+        output['outputUrl'] = output_base_url.format(api='output', **output)
+        output['visualizerUrl'] = visualiser_base_url.format(api='game', **output)
     return render_template('index.html',
                            outputs=outputs)
 
