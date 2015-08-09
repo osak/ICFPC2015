@@ -9,4 +9,5 @@ LIB_PATH = os.path.join(SCRIPT_DIR, 'lib')
 args = ['java', '-cp', '{0}:{1}/*'.format(JAR_PATH, LIB_PATH), 'icfpc.Main', '-p', sys.argv[1], '-a', sys.argv[2]]
 if len(sys.argv) >= 4 and sys.argv[3] == '-s':
     args.append('-s')
+    args.append('-A')
 subprocess.call(args)
