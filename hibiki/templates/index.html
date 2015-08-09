@@ -4,6 +4,12 @@
     <h1>Hibiki</h1>
     <h2>Submission Viewer</h2>
 
+    <div id="submissionReview">
+        <button id="submissionReviewButton">
+            Submit Best Output
+        </button>
+    </div>
+
     <div id="comparatorConfig" class="container">
         <label for="compareWithPoyo">
             Compare with 7th_building:
@@ -112,6 +118,9 @@
         $(document).ready(function() {
             $('.filterInput').change(filterUpdate);
             $('#compareButton').click(goCompare);
+            $('#submissionReviewButton').click(function() {
+                location.href = "{{ my_url_for('submission') }}";
+            });
         });
     </script>
 </div>
