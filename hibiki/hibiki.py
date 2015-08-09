@@ -57,13 +57,16 @@ def get_submission_scores(revs, poyo):
                 summary[prob_id] = dict()
             summary[prob_id]['poyo'] = [score]
 
+    best = dict()
     for prob_id, row in summary.items():
         for rev, scores in row.items():
             row[rev] = sum(scores) / len(scores)
         for rev in revs:
-            if rev not in revset:
+            if rev not in row:
                 row[rev] = 0
-    return summary, names
+        best[prob_id] = max(row.values())
+
+    return summary, names, best
 
 
 @app.route("/compare")
@@ -74,8 +77,8 @@ def compare():
     else:
         revs = []
     poyo = bool(request.args.get('poyo'))
-    summary, names = get_submission_scores(revs, poyo)
-    return render_template('compare.html', revs=names.keys(), names=names, problems=summary.keys(), summary=summary)
+    summary, names, best = get_submission_scores(revs, poyo)
+    return render_template('compare.html', revs=names.keys(), names=names, problems=summary.keys(), summary=summary, best=best)
 
 
 def get_all_output():
