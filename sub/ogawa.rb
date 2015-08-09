@@ -10,6 +10,7 @@ require_relative 'env'
 require_relative 'lib/post'
 require_relative 'lib/db'
 
+Mongo::Logger.logger.level = ::Logger::INFO
 API_TOKEN = 'yvNVFcvQWZGrDZKWRuA786nhrj3BA35kHbJIDsukAb0='.freeze
 URL = 'https://davar.icfpcontest.org/teams/59/solutions'.freeze
 STORAGE_PATH = 'storage'.freeze
