@@ -11,8 +11,7 @@ logger = logging.getLogger('akatsuki')
 app = Flask(__name__)
 
 
-@app.route("/game/<int:prob_id>/<int:seed>/<rev>/")
-def get_game(prob_id, seed, rev):
+def get_game_json(prob_id, seed, rev, fr=0, to=1e9):
     client = pymongo.MongoClient(MONGO_URI)
     query = {'problemId': prob_id, 'seed': seed, 'revision': rev}
     logger.info('/game api hit.')
@@ -29,11 +28,21 @@ def get_game(prob_id, seed, rev):
     result = []
     used_turn = set()
     for document in documents:
-        if document['turn'] not in used_turn:
+        turn = document['turn']
+        if turn not in used_turn and fr <= turn <= to:
             result.append(document)
             used_turn.add(document['turn'])
     return Response(json.dumps(result), content_type='application/json')
 
+
+@app.route("/game/<int:prob_id>/<int:seed>/<rev>/<int:fr>-<int:to>")
+def get_partial_game(prob_id, seed, rev, fr, to):
+    return get_game_json(prob_id, seed, rev, fr, to)
+
+
+@app.route("/game/<int:prob_id>/<int:seed>/<rev>/")
+def get_game(prob_id, seed, rev):
+    return get_game_json(prob_id, seed, rev)
 
 @app.route("/board/<int:prob_id>/<int:seed>/<rev>/<int:turn>/")
 def get_board(prob_id, seed, rev, turn):
