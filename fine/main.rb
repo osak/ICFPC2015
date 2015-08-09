@@ -34,18 +34,23 @@ run_date_utc = ARGV[3]
 
   log "loading visfile for #{probid}"
   vis_json = JSON.parse(File.read(visfile))
-  seed = vis_json['settings']['initialSeed']
-  score = vis_json['diffBoards'].last['s']
-  vis_json['revision'] = revision
-  vis_json['problemId'] = probid
-  vis_json['comment'] = comment
-  vis_json['seed'] = seed
-  client[:vis].insert_one(vis_json)
+  log "\t#{vis_json.size} solutions"
+  score_dict = Hash.new
+  vis_json.each do |vis|
+    seed = vis['settings']['initialSeed']
+    score_dict[seed] = vis['diffBoards'].last['s']
+    vis['revision'] = revision
+    vis['problemId'] = probid
+    vis['comment'] = comment
+    vis['seed'] = seed
+  end
+  client[:vis].insert_many(vis_json)
 
   log "loading outfile for #{probid}"
   output_json = JSON.parse(File.read(outfile))
   output_json.each do |out|
-    if seed == out['seed']
+    score = score_dict[out['seed']]
+    if score
       out['score'] = score
     end
     out['revision'] = revision
