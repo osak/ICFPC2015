@@ -8,6 +8,11 @@
             Compare with 7th_building:
         </label>
         <input id="compareWithPoyo" type="checkbox">
+
+        <label for="compareWithBest">
+            Compare with Global Best:
+        </label>
+        <input id="compareWithBest" type="checkbox">
         <button id="compareButton">
             Compare
         </button>
@@ -29,6 +34,9 @@
             var uri = 'compare?revs=' + revisionList.join(',');
             if (document.getElementById('compareWithPoyo').checked) {
                 uri += '&poyo=1';
+            }
+            if (document.getElementById('compareWithBest').checked) {
+                uri += '&best=1';
             }
             location.href = uri;
         }

@@ -126,6 +126,16 @@ def submit_data(docs):
         return False
 
 
+def get_best_rev_score(summary):
+    bestrev = dict()
+    bestscore = dict()
+    for prob_id in summary:
+        maxrev, maxscore = max(summary[prob_id].items(), key=lambda tup: tup[1])
+        bestrev[prob_id] = maxrev
+        bestscore[prob_id] = maxscore
+    return bestrev, bestscore
+
+
 @app.route("/submission", methods=["GET", "POST"])
 def submission():
     context = dict()
@@ -139,25 +149,26 @@ def submission():
         context["message"] = "Success!" if submit_data(submission_data) else "Failure..."
         # fall through to get proessing
     summary, names, best, docs, runtime = get_submission_scores([], False, allrevs=True)
-    bestrev = dict()
-    bestscore = dict()
-    for prob_id in summary:
-        maxrev, maxscore = max(summary[prob_id].items(), key=lambda tup: tup[1])
-        bestrev[prob_id] = maxrev
-        bestscore[prob_id] = maxscore
+    bestrev, bestscore = get_best_rev_score(summary)
     return render_template('submission.html', names=names, problems=summary.keys(), bestrev=bestrev, bestscore=bestscore, **context)
 
 
 @app.route("/compare")
 def compare():
+    context = dict()
     revs = request.args.get('revs')
     if revs:
         revs = revs.split(',')
     else:
         revs = []
     poyo = bool(request.args.get('poyo'))
+    global_best = bool(request.args.get('best'))
     summary, names, best, docs, runtime = get_submission_scores(revs, poyo)
-    return render_template('compare.html', revs=names.keys(), names=names, problems=summary.keys(), summary=summary, best=best, runtime=runtime)
+    if global_best:
+        global_best_rev, global_best_score = get_best_rev_score(get_submission_scores([], False, allrevs=True)[0])
+        context['global_best_rev'] = global_best_rev
+        context['global_best_score'] = global_best_score
+    return render_template('compare.html', revs=names.keys(), names=names, problems=summary.keys(), summary=summary, best=best, runtime=runtime, **context)
 
 
 def get_all_output(query=None):

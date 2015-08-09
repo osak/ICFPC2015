@@ -10,6 +10,9 @@
             {% for rev in revs %}
             <th>{{ names[rev] }}</th>
             {% endfor %}
+            {% if global_best_score is defined %}
+            <th>Global Best</th>
+            {% endif %}
         </tr>
         </thead>
         <tbody>
@@ -21,6 +24,9 @@
                     {{ summary[prob_id][rev] }} ({{ runtime[prob_id][rev] }})
                 </td>
                 {% endfor %}
+                {% if global_best_score is defined %}
+                <td>{{ global_best_score[prob_id] }} (<a href="{{ my_url_for('view_revision', revision=global_best_rev[prob_id]) }}">rev link</a>)</td>
+                {% endif %}
             </tr>
             {% endfor %}
         </tbody>
