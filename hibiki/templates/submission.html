@@ -1,12 +1,11 @@
 {% extends "common.html" %}
 {% block content %}
 <div class="container">
-    <h1>Hibiki</h1>
-    <h2>Submission Review</h2>
+    <h1>Submission Review</h1>
     {% if message is defined %}
-    <h3>Submission {{ message }}</h3>
+    <h2>Submission {{ message }}</h2>
     {% else %}
-    <h3>You are going to submit this output. Are you sure?</h3>
+    <p>You are going to submit this output. Are you sure?</p>
     <form id="submitForm" method="post">
         {% for prob_id in problems %}
         <input type="hidden" name="rev:{{ prob_id }}" value="{{ bestrev[prob_id] }}">
