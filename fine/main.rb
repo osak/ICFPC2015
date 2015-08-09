@@ -35,6 +35,10 @@ run_date_utc = ARGV[3]
   vis_json = JSON.parse(File.read(visfile))
   seed = vis_json['settings']['randomSeed']
   score = vis_json['diffBoards'].last['s']
+  vis_json['revision'] = revision
+  vis_json['problemId'] = probid
+  vis_json['comment'] = comment
+  vis_json['seed'] = seed
   client[:vis].insert_one(vis_json)
 
   log "loading outfile for #{probid}"
