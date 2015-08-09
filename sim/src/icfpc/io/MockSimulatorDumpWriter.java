@@ -28,6 +28,6 @@ public class MockSimulatorDumpWriter implements SimulatorDumpWriter {
 
     @Override
     public void end() throws IOException {
-        
+
     }
 }

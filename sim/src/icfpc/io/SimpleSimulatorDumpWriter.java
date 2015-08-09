@@ -31,8 +31,8 @@ public class SimpleSimulatorDumpWriter implements SimulatorDumpWriter {
     @Override
     public void begin(Board board) throws IOException {
         if (allMode) {
-            outputStream.write("[".getBytes());
             if (firstTest) {
+                outputStream.write("[".getBytes());
                 firstTest = false;
             } else {
                 outputStream.write(",".getBytes());

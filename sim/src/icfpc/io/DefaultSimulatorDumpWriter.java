@@ -15,8 +15,8 @@ public class DefaultSimulatorDumpWriter implements SimulatorDumpWriter {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     private final OutputStream outputStream;
-    private boolean firstBoard;
-    private boolean firstTest;
+    private boolean firstBoard = true;
+    private boolean firstTest = true;
     private final boolean allMode;
     private Map<String, Object> appendix = new HashMap<>();
 
@@ -28,14 +28,13 @@ public class DefaultSimulatorDumpWriter implements SimulatorDumpWriter {
     @Override
     public void begin(Board board) throws IOException {
         if (allMode) {
-            outputStream.write("[".getBytes());
             if (firstTest) {
+                outputStream.write("[".getBytes());
                 firstTest = false;
             } else {
-                outputStream.write("],".getBytes());
+                outputStream.write(",".getBytes());
             }
             firstBoard = true;
-            outputStream.write("[".getBytes());
         }
         outputStream.write(String.format("{\"settings\": %s, \"boards\": [\n", mapper.writeValueAsString(board.getGameSettings())).getBytes());
     }
