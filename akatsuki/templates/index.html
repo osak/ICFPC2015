@@ -5,7 +5,7 @@
 
 <h3>Dev info</h3>
 <ul>
-    <li> game API endpoint /akatsuki/game/problemId/seed/revision/ example: <a href="/akatsuki{{ url_for('get_game', prob_id=0, seed=0, rev='6f248b8b4a95c9cd9a720c573c4c50876ac20205') }}">here</a> </li>
-    <li> output API endpoint /akatsuki/output/problemId/seed/revision/ example: <a href="/akatsuki{{ url_for('get_output', prob_id=0, seed=0, rev='6f248b8b4a95c9cd9a720c573c4c50876ac20205') }}">here</a> </li>
+    <li> game API endpoint /akatsuki/game/problemId/seed/revision/ example: <a href="{{ my_url_for('get_game', prob_id=0, seed=0, rev='6f248b8b4a95c9cd9a720c573c4c50876ac20205') }}">here</a> </li>
+    <li> output API endpoint /akatsuki/output/problemId/seed/revision/ example: <a href="{{ my_url_for('get_output', prob_id=0, seed=0, rev='6f248b8b4a95c9cd9a720c573c4c50876ac20205') }}">here</a> </li>
 </ul>
 {% endblock %}
