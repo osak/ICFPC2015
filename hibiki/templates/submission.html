@@ -1,0 +1,39 @@
+{% extends "common.html" %}
+{% block content %}
+<div class="container">
+    <h1>Hibiki</h1>
+    <h2>Submission Review</h2>
+    {% if message is defined %}
+    <h3>Submission {{ message }}</h3>
+    {% else %}
+    <h3>You are going to submit this output. Are you sure?</h3>
+    <form id="submitForm" method="post">
+        {% for prob_id in problems %}
+        <input type="hidden" name="rev:{{ prob_id }}" value="{{ bestrev[prob_id] }}">
+        {% endfor %}
+        <button>
+            Submit!!!
+        </button>
+    </form>
+    {% endif %}
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Problem ID</th>
+            <th>Comment</th>
+            <th>Score</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for prob_id in problems %}
+            <tr>
+                <td>{{ prob_id }}</td>
+                <td>{{ names[bestrev[prob_id]] }}</td>
+                <td>{{ bestscore[prob_id] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}
