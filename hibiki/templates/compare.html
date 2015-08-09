@@ -1,0 +1,29 @@
+{% extends "common.html" %}
+{% block content %}
+<div class="container">
+    <h1>Hibiki</h1>
+    <h2>Submission Comparator</h2>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Problem ID</th>
+            {% for rev in revs %}
+            <th>{{ names[rev] }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+            {% for prob_id in problems %}
+            <tr>
+                <td>{{ prob_id }}</td>
+                {% for rev in revs %}
+                <td>{{ summary[prob_id][rev] }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}
