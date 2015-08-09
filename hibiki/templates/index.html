@@ -4,6 +4,23 @@
     <h1>Hibiki</h1>
     <h2>Submission Viewer</h2>
 
+    <div id="filterConfig" class="container">
+        <label for="filterConfig">
+            Revision starts with:
+        </label>
+        <input type="text" id="revisionFilter" class="filterInput">
+
+        <label for="problemFilter">
+            Problem ID with:
+        </label>
+        <input type="text" id="problemFilter" class="filterInput">
+
+        <label for="seedFilter">
+            Seed with:
+        </label>
+        <input type="text" id="seedFilter" class="filterInput">
+    </div>
+
     <table class="table">
         <thead>
         <tr>
@@ -17,7 +34,7 @@
         </thead>
         <tbody>
         {% for output in outputs %}
-        <tr>
+        <tr class="tableRow" revision="{{ output['revision'] }}" problemid="{{ output['problemId'] }}" seed="{{ output['seed'] }}">
             <td>{{ output['revision'] }}</td>
             <td>{{ output['problemId'] }}</td>
             <td>{{ output['seed'] }}</td>
@@ -28,5 +45,38 @@
         {% endfor %}
         </tbody>
     </table>
+
+    <script type="application/javascript">
+        function filterUpdate() {
+            var revisionPrefix = $('#revisionFilter').val();
+            var problemId = $('#problemFilter').val();
+            var seed = $('#seedFilter').val();
+            $('.tableRow').each(function(index) {
+                var thisRevision = this.getAttribute("revision");
+                var thisId = this.getAttribute("problemid");
+                var thisSeed = this.getAttribute("seed");
+
+                var filtered = false;
+                if (revisionPrefix && thisRevision.indexOf(revisionPrefix) == -1) {
+                    filtered = true;
+                }
+                if (problemId && parseInt(thisId) !== parseInt(problemId)) {
+                    filtered = true;
+                }
+                if (seed && parseInt(thisSeed) !== parseInt(seed)) {
+                    filtered = true;
+                }
+                if (filtered) {
+                    this.classList.add('hidden')
+                } else {
+                    this.classList.remove('hidden')
+                }
+            })
+        }
+
+        $(document).ready(function() {
+            $('.filterInput').change(filterUpdate);
+        });
+    </script>
 </div>
 {% endblock %}
