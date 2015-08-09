@@ -37,7 +37,7 @@ output/%: solution.exe
 
 CPP_SOURCE = ai/AI/lightningAI.cpp ai/evaluation/lightningeval.cpp ai/main.cpp ai/util.cpp
 solution.exe: $(CPP_SOURCE)
-	c++ -std=c++11 -O3 -o $@ $^
+	c++ -I ai/lib -std=c++11 -O3 -o $@ $^
 
 solver-source: gachi-source.tar.gz
 

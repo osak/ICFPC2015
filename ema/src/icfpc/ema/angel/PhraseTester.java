@@ -61,7 +61,7 @@ public class PhraseTester {
         while (phrase.hasNext()) {
             final char cmd = phrase.next();
             if (board.hasEnded()) {
-                board.violateRule();
+                board.violateRule("");
                 return false;
             }
             board.operate(cmd);
