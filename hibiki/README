@@ -1,0 +1,6 @@
+Hibiki
+
+To run this webapp, just run following command.
+$ python main.py
+
+You can change configuration in config.py

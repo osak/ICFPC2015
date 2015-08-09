@@ -1,0 +1,32 @@
+{% extends "common.html" %}
+{% block content %}
+<div class="container">
+    <h1>Hibiki</h1>
+    <h2>Submission Viewer</h2>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Revision</th>
+            <th>Problem ID</th>
+            <th>Seed</th>
+            <th>Score</th>
+            <th>Output</th>
+            <th>VisDump</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for output in outputs %}
+        <tr>
+            <td>{{ output['revision'] }}</td>
+            <td>{{ output['problemId'] }}</td>
+            <td>{{ output['seed'] }}</td>
+            <td>{{ output['score'] }}</td>
+            <td><a href="{{ output['outputUrl'] }}">Output</a></td>
+            <td><a href="{{ output['visdumpUrl'] }}">VisDump</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
