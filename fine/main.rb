@@ -47,7 +47,7 @@ target_prob = ARGV[4] && ARGV[4].to_i
     vis['problemId'] = probid
     vis['comment'] = comment
     vis['seed'] = seed
-    client[:vis].insert_one(vis)
+    #client[:vis].insert_one(vis)
   end
 
   log "loading outfile for #{probid}"
