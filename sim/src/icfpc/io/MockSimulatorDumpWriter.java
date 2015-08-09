@@ -25,4 +25,9 @@ public class MockSimulatorDumpWriter implements SimulatorDumpWriter {
     @Override
     public void close() throws IOException {
     }
+
+    @Override
+    public void end() throws IOException {
+        
+    }
 }
