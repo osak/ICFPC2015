@@ -2,15 +2,27 @@
 
 __author__ = 'shunsuke'
 
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, url_for
 import pymongo
-from config import MONGO_URI, AKATSUKI_HOST, AKATSUKI_PORT
+from config import MONGO_URI, AKATSUKI_HOST, AKATSUKI_PORT, ENVIRONMENT
 import logging
 import json
 
 
 logger = logging.getLogger('akatsuki')
 app = Flask(__name__)
+
+
+def my_url_for(endpoint, **values):
+    if ENVIRONMENT == "prod":
+        return "/hibiki" + url_for(endpoint, **values)
+    else:
+        return url_for(endpoint, **values)
+
+
+@app.context_processor
+def utility_processor():
+    return dict(my_url_for=my_url_for)
 
 
 def get_game_json(prob_id, seed, rev):
@@ -63,5 +75,6 @@ def hello():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    message_level = logging.WARN if ENVIRONMENT == "prod" else logging.INFO
+    logging.basicConfig(level=message_level)
     app.run(host=AKATSUKI_HOST, port=AKATSUKI_PORT)
