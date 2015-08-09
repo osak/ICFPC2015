@@ -150,10 +150,12 @@ def compare():
     return render_template('compare.html', revs=names.keys(), names=names, problems=summary.keys(), summary=summary, best=best)
 
 
-def get_all_output():
+def get_all_output(query=None):
+    if query is None:
+        query = {}
     client = pymongo.MongoClient(MONGO_URI)
     logger.info('collect all output.')
-    cursor = client.kadingel.output.find(projection={'_id': False})
+    cursor = client.kadingel.output.find(query, projection={'_id': False})
     documents = list(cursor.sort([('runDateUtc', pymongo.DESCENDING), ('problemId', pymongo.ASCENDING), ('seed', pymongo.ASCENDING)]))
     client.close()
     # filter duplicated docs
@@ -167,9 +169,8 @@ def get_all_output():
     return result
 
 
-@app.route("/")
-def index():
-    outputs = get_all_output()
+def render_output_table_page(query, template_name):
+    outputs = get_all_output(query=query)
     output_base_url = 'http://icfpc.osak.jp/akatsuki/{api}/{problemId}/{seed}/{revision}/'
     visualiser_base_url = 'http://icfpc.osak.jp/nastasja/index.html?revision={revision}&problemId={problemId}&seed={seed}'
     for output in outputs:
@@ -178,8 +179,23 @@ def index():
         datetime_obj = datetime.datetime.fromtimestamp(int(output['runDateUtc']))
         output['runDateString'] = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
         output['elapsedTime'] = '{:0.3f}'.format(output['elapsedTime'])
-    return render_template('index.html',
+    return render_template(template_name,
                            outputs=outputs)
+
+
+@app.route("/revision/<revision>")
+def view_revision(revision):
+    return render_output_table_page({'revision': revision}, 'view_revision.html')
+
+
+@app.route("/viewall")
+def viewall():
+    return render_output_table_page({}, 'viewall.html')
+
+
+@app.route("/")
+def index():
+    return render_output_table_page({'problemId': 0, 'seed': 0}, 'viewall.html')
 
 
 if __name__ == "__main__":
