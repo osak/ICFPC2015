@@ -84,18 +84,14 @@ public class Main {
                 final char cmd = commandReader.next();
                 if (board.hasEnded()) {
                     board.violateRule("余分な命令");
-                    if (i == 0) {
-                        simulatorDumpWriter.write(board);
-                    }
+                    simulatorDumpWriter.write(board);
                     break;
                 }
                 board.operate(cmd);
                 if (opts.getMode() == CommandLineOption.Mode.INTERACTIVE) {
                     board.debug();
                 }
-                if (i == 0) {
-                    simulatorDumpWriter.write(board);
-                }
+                simulatorDumpWriter.write(board);
 
                 if (board.hasEnded()) {
                     break;

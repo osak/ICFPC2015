@@ -4,6 +4,16 @@
     <h1>Hibiki</h1>
     <h2>Submission Viewer</h2>
 
+    <div id="comparatorConfig" class="container">
+        <label for="compareWithPoyo">
+            Compare with 7th_building:
+        </label>
+        <input id="compareWithPoyo" type="checkbox">
+        <button id="compareButton">
+            Compare
+        </button>
+    </div>
+
     <div id="filterConfig" class="container">
         <label for="commentFilter">
             Comment contains:
@@ -24,6 +34,7 @@
     <table class="table">
         <thead>
         <tr>
+            <th></th>
             <th>Date</th>
             <th>Comment</th>
             <th>Problem ID</th>
@@ -37,6 +48,7 @@
         <tbody>
         {% for output in outputs %}
         <tr class="tableRow" comment="{{ output['comment'] }}" problemid="{{ output['problemId'] }}" seed="{{ output['seed'] }}">
+            <td><input type="checkbox" class="revisionCheck" revision="{{ output['revision'] }}"></td>
             <td>{{ output['runDateString'] }}</td>
             <td>{{ output['comment'] }}</td>
             <td>{{ output['problemId'] }}</td>
@@ -78,8 +90,28 @@
             })
         }
 
+        function goCompare() {
+            var revisionSet = {};
+            $('.revisionCheck').each(function(index) {
+                var thisRevision = this.getAttribute("revision");
+                if (this.checked) {
+                    revisionSet[thisRevision] = 1;
+                }
+            });
+            var revisionList = [];
+            for (var revision in revisionSet) {
+                revisionList.push(revision);
+            }
+            var uri = 'compare?revs=' + revisionList.join(',');
+            if (document.getElementById('compareWithPoyo').checked) {
+                uri += '&poyo=1';
+            }
+            location.href = uri;
+        }
+
         $(document).ready(function() {
             $('.filterInput').change(filterUpdate);
+            $('#compareButton').click(goCompare);
         });
     </script>
 </div>

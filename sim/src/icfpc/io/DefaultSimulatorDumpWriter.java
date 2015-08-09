@@ -35,18 +35,23 @@ public class DefaultSimulatorDumpWriter implements SimulatorDumpWriter {
                 outputStream.write(",".getBytes());
             }
             firstBoard = true;
+            appendix.clear();
         }
-        outputStream.write(String.format("{\"settings\": %s, \"boards\": [\n", mapper.writeValueAsString(board.getGameSettings())).getBytes());
+        if (allMode || firstTest) {
+            outputStream.write(String.format("{\"settings\": %s, \"boards\": [\n", mapper.writeValueAsString(board.getGameSettings())).getBytes());
+        }
     }
 
     @Override
     public void write(final Board board) throws IOException {
-        if (!firstBoard) {
-            outputStream.write(",".getBytes());
+        if (allMode || firstTest) {
+            if (!firstBoard) {
+                outputStream.write(",".getBytes());
+            }
+            firstBoard = false;
+            outputStream.write(mapper.writeValueAsString(board).getBytes());
+            outputStream.write("\n".getBytes());
         }
-        firstBoard = false;
-        outputStream.write(mapper.writeValueAsString(board).getBytes());
-        outputStream.write("\n".getBytes());
     }
 
     @Override
@@ -56,11 +61,16 @@ public class DefaultSimulatorDumpWriter implements SimulatorDumpWriter {
 
     @Override
     public void end() throws IOException {
-        outputStream.write("]".getBytes());
-        for (final Map.Entry<String, Object> entry : appendix.entrySet()) {
-            outputStream.write(String.format("\n, \"%s\": %s", entry.getKey(), mapper.writeValueAsString(entry.getValue())).getBytes());
+        if (allMode || firstTest) {
+            if (firstTest) {
+                firstTest = false;
+            }
+            outputStream.write("]".getBytes());
+            for (final Map.Entry<String, Object> entry : appendix.entrySet()) {
+                outputStream.write(String.format("\n, \"%s\": %s", entry.getKey(), mapper.writeValueAsString(entry.getValue())).getBytes());
+            }
+            outputStream.write("}".getBytes());
         }
-        outputStream.write("}".getBytes());
     }
 
     @Override
