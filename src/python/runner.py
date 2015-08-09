@@ -4,6 +4,7 @@ import os
 import json
 from translate import translate_single
 import time
+import daisaku
 
 aidebug_dir = None
 
@@ -30,6 +31,7 @@ def run(exe_path, config, seed):
     if aidebug_dir:
         with open(get_path(aidebug_dir, config['id']) + '.{}.txt'.format(seed), 'w') as writer:
             writer.write(stderr)
+    #command = daisaku.optimize(command)
     elapsed_time = time.time() - start_time
     return create_single_output(config, seed, command, elapsed_time)
 
