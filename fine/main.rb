@@ -2,6 +2,7 @@
 
 require 'mongo'
 require 'json'
+require 'pp'
 
 def log(s)
   STDERR.puts "[LOG] #{s}"
@@ -33,7 +34,7 @@ run_date_utc = ARGV[3]
 
   log "loading visfile for #{probid}"
   vis_json = JSON.parse(File.read(visfile))
-  seed = vis_json['settings']['randomSeed']
+  seed = vis_json['settings']['initialSeed']
   score = vis_json['diffBoards'].last['s']
   vis_json['revision'] = revision
   vis_json['problemId'] = probid
