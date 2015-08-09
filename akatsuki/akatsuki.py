@@ -15,7 +15,7 @@ app = Flask(__name__)
 
 def my_url_for(endpoint, **values):
     if ENVIRONMENT == "prod":
-        return "/hibiki" + url_for(endpoint, **values)
+        return "/akatsuki" + url_for(endpoint, **values)
     else:
         return url_for(endpoint, **values)
 
