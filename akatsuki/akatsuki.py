@@ -1,3 +1,5 @@
+#! /usr/bin/python
+
 __author__ = 'shunsuke'
 
 from flask import Flask, render_template, Response
