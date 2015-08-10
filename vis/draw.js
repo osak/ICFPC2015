@@ -106,6 +106,7 @@
             drawPivot(drawPos.x, drawPos.y);
         }
         $('#score').text(board.score);
+        $('#casted').text(board.castedSpells.join("\n"));
     }
 
     function initProblemSelector() {
