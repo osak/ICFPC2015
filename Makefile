@@ -5,7 +5,8 @@ VISDUMP_SIMPLE_FAST = visdump-simple/problem_0.json visdump-simple/problem_1.jso
 VISDUMP_SIMPLE_HEAVY = visdump-simple/problem_14.json visdump-simple/problem_24.json
 SUBMIT_ALL = submit/problem_0.json submit/problem_1.json submit/problem_2.json submit/problem_3.json submit/problem_4.json submit/problem_5.json submit/problem_6.json submit/problem_7.json submit/problem_8.json submit/problem_9.json submit/problem_10.json submit/problem_11.json submit/problem_12.json submit/problem_13.json submit/problem_14.json submit/problem_15.json submit/problem_16.json submit/problem_17.json submit/problem_18.json submit/problem_19.json submit/problem_20.json submit/problem_21.json submit/problem_22.json submit/problem_23.json submit/problem_24.json
 
-default: solution.exe
+BINARY_ALL = solution.exe solution_small.exe
+default: $(BINARY_ALL)
 
 visdump-all: $(VISDUMP_ALL)
 visdump-simple-all: $(VISDUMP_SIMPLE_ALL)
@@ -32,12 +33,16 @@ visdump-simple/%: output/%
 	sim/run.py problems/$* output/$* -s > visdump-simple/$* 2> /dev/null
 	fine/each.sh "$*"
 
-output/%: solution.exe
+output/%: $(BINARY_ALL)
 	mkdir -p output
 	./play_icfp2015 -f problems/$* > output/$*
 
 CPP_SOURCE = ai/AI/lightningAI.cpp ai/evaluation/lightningeval.cpp ai/main.cpp ai/util.cpp
 solution.exe: $(CPP_SOURCE)
+	c++ -I ai/lib -std=c++11 -O3 -o $@ $^
+
+CPP_SMALL_SOURCE = ai/AI/lightningAI_small.cpp ai/evaluation/lightningeval_small.cpp ai/main_small.cpp ai/util_small.cpp
+solution_small.exe: $(CPP_SMALL_SOURCE)
 	c++ -I ai/lib -std=c++11 -O3 -o $@ $^
 
 solver-source: gachi-source.tar.gz
@@ -47,7 +52,7 @@ gachi-source.tar.gz:
 	tar czf gachi-source.tar.gz $(SOLVER_DEPENDENCY)
 
 clean:
-	rm -rf solution.exe output visdump aidebug gachi-source.tar.gz
+	rm -rf $(BINARY_ALL) output visdump aidebug gachi-source.tar.gz
 
 .PRECIOUS: output/%
 
