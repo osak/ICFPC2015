@@ -3,6 +3,7 @@ package icfpc.common;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -418,7 +419,7 @@ public class Board {
             gen.writeNumberField("moveScore", value.moveScore);
             gen.writeNumberField("powerScore", value.powerScore);
             gen.writeNumberField("clearedRows", value.prevClearedRows);
-            gen.writeStringField("castedNow", value.castedNow);
+            gen.writeObjectField("castedSpells", value.castedSpells);
             //gen.writeNumberField("width", value.gameSettings.width);
             //gen.writeNumberField("height", value.gameSettings.height);
             //gen.writeNumberField("maxSources", value.gameSettings.maxSources);
@@ -463,10 +464,10 @@ public class Board {
             ret.currentUnit = unit;
             ret.currentUnitPivot = pivot;
             ret.currentAngle = Angle.CLOCK_0;
-
             ret.moveScore = root.get("moveScore").asInt();
             ret.powerScore = root.get("powerScore").asInt();
             ret.prevClearedRows = root.get("clearedRows").asInt();
+            ret.castedSpells = root.get("castedSpells").traverse(p.getCodec()).readValueAs(new TypeReference<Set<Spell>>() {});
 
             return ret;
         }
