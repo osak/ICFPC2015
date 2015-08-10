@@ -1,6 +1,5 @@
 package icfpc.ema.angel;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
