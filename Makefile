@@ -30,6 +30,7 @@ visdump/%: output/%
 visdump-simple/%: output/%
 	mkdir -p visdump-simple
 	sim/run.py problems/$* output/$* -s > visdump-simple/$* 2> /dev/null
+	fine/each.sh "$*"
 
 output/%: solution.exe
 	mkdir -p output
