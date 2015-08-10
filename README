@@ -22,7 +22,7 @@ Product List
   * Random
    [describe here]
   * Daisaku
-   Command optimizer works in post-processing
+   Command post-processor to optimize phrase casting.
 
  * akatsuki
   mongodb API endpoint.
@@ -42,7 +42,6 @@ Product List
 
  * ikazuchi
   leaderboard watcher process.
-
 
  * nastasja
   Game visualizer integrated with mongodb (akatsuki API).
