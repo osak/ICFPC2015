@@ -16,6 +16,8 @@ import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import icfpc.random.Randomizer;
 import org.apache.log4j.Logger;
@@ -28,6 +30,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -39,7 +42,7 @@ public class Board {
     private static final Logger LOGGER = Logger.getLogger(Board.class);
     private final GameSettings gameSettings;
 
-    private Set<Spell> castedSpells = new HashSet<>();
+    private Map<String, Integer> castedSpells = Maps.newHashMap();
     private List<Character> allCommands = new ArrayList<>();
     private Set<Cell> filled;
     private Unit currentUnit;
@@ -203,12 +206,13 @@ public class Board {
                     }
                 }
                 if (casted) {
-                    if (!castedSpells.contains(spell)) {
-                        castedSpells.add(spell);
+                    if (!castedSpells.keySet().contains(spell)) {
+                        castedSpells.put(spell.phrase, 1);
                         castedNow = spell.phrase;
                         powerScore += 300;
                     }
                     LOGGER.info("CASTED: " + spell.phrase);
+                    castedSpells.put(spell.phrase, castedSpells.get(spell.phrase) + 1);
                     powerScore += 2 * spell.phrase.length();
                 }
             }
@@ -423,7 +427,11 @@ public class Board {
             gen.writeNumberField("moveScore", value.moveScore);
             gen.writeNumberField("powerScore", value.powerScore);
             gen.writeNumberField("clearedRows", value.prevClearedRows);
-            gen.writeObjectField("castedSpells", value.castedSpells);
+            List<String> castedList = Lists.newArrayList();
+            for (String key : value.castedSpells.keySet()) {
+                castedList.add(key + " " + value.castedSpells.get(key));
+            }
+            gen.writeObjectField("castedSpells", castedList);
             //gen.writeNumberField("width", value.gameSettings.width);
             //gen.writeNumberField("height", value.gameSettings.height);
             //gen.writeNumberField("maxSources", value.gameSettings.maxSources);
@@ -471,7 +479,12 @@ public class Board {
             ret.moveScore = root.get("moveScore").asInt();
             ret.powerScore = root.get("powerScore").asInt();
             ret.prevClearedRows = root.get("clearedRows").asInt();
-            ret.castedSpells = root.get("castedSpells").traverse(p.getCodec()).readValueAs(new TypeReference<Set<Spell>>() {});
+            List<String> castedList = root.get("castedSpells").traverse(p.getCodec()).readValueAs(new TypeReference<List<String>>() {});
+            ret.castedSpells = Maps.newHashMap();
+            for (String kvStr : castedList) {
+                final String[] kv = kvStr.split(" ");
+                ret.castedSpells.put(kv[0], Integer.valueOf(kv[1]));
+            }
 
             return ret;
         }
