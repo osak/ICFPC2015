@@ -3,31 +3,34 @@ from argparse import ArgumentParser
 import json
 from src.python.runner import run
 from multiprocessing import Pool
-import src.python.daisaku
-
+from src.python.phrases import known_phrases
 
 def mapper(args):
     return run(*args)
 
 
+def binary_selector(config):
+    return './solution.exe'
+
+
 def main():
     parser = ArgumentParser()
-    parser.add_argument('-f', metavar='json', nargs='*', type=file)
+    parser.add_argument('-f', metavar='json', action='append', type=file)
     parser.add_argument('-t', metavar='timelimit', type=int)
     parser.add_argument('-m', metavar='memorylimit', type=int)
     parser.add_argument('-c', metavar='cores', type=int, default=1)
-    parser.add_argument('-p', metavar='phrase', nargs='*', type=str)
+    parser.add_argument('-p', metavar='phrase', action='append', type=str)
     args = parser.parse_args()
 
-    if args.p:
-        src.python.daisaku.spell_list = args.p
+    if not args.p:
+        args.p = known_phrases
 
     pool = Pool(args.c)
     queries = []
     for conffile in args.f:
         config = json.load(conffile)
         for seed in config['sourceSeeds']:
-            queries.append(('./solution.exe', config, seed))
+            queries.append((binary_selector(config), config, seed, args.p))
 
     result = pool.map(mapper, queries)
     print json.dumps(result)

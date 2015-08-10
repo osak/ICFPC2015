@@ -5,6 +5,7 @@ import json
 from translate import translate_single
 import time
 import daisaku
+from phrases import known_phrases
 
 aidebug_dir = None
 
@@ -23,15 +24,18 @@ def create_single_output(config, seed, command, elapsed_time):
     }
 
 
-def run(exe_path, config, seed):
+def run(exe_path, config, seed, phrases=None):
+    if phrases is None:
+        phrases = []
     start_time = time.time()
-    input_string = translate_single(config, seed)
+    input_string = translate_single(config, seed, phrases)
     proc = subprocess.Popen([exe_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     command, stderr = proc.communicate(input_string)
     if aidebug_dir:
         with open(get_path(aidebug_dir, config['id']) + '.{}.txt'.format(seed), 'w') as writer:
             writer.write(stderr)
-    #command = daisaku.optimize(command)
+    if phrases:
+        command = daisaku.optimize(command, phrases)
     elapsed_time = time.time() - start_time
     return create_single_output(config, seed, command, elapsed_time)
 
@@ -40,7 +44,7 @@ def solve(exe_path, input_path, output_path, problem_id):
     config_path = get_path(input_path, problem_id)
     with open(config_path) as reader:
         config = json.load(reader)
-    output = [run(exe_path, config, seed) for seed in config['sourceSeeds']]
+    output = [run(exe_path, config, seed, known_phrases) for seed in config['sourceSeeds']]
     output_path = get_path(output_path, problem_id)
     with open(output_path, 'w') as writer:
         json.dump(output, writer)
