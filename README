@@ -40,8 +40,9 @@ Product List
  * hibiki
   AI output manager webapp.
 
- * leaderboard_watcher
-  Its name describes exactly what he does.
+ * ikazuchi
+  leaderboard watcher process.
+
 
  * nastasja
   Game visualizer integrated with mongodb (akatsuki API).
