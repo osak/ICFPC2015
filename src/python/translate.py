@@ -14,7 +14,7 @@ class Rand(object):
         return ret
 
 
-def translate_single(config, seed, phrases=None):
+def translate_single(config, seed, phrases=None, timelimit=3600):
     if phrases is None:
         phrases = []
     output = StringIO()
@@ -34,6 +34,7 @@ def translate_single(config, seed, phrases=None):
     print >> output, len(phrases)
     for phrase in phrases:
         print >> output, len(phrase), ''.join(map(str, input_mapper.command_to_move(phrase))).replace(str(input_mapper.IGNORED), '')
+    print >> output, timelimit
     return output.getvalue()
 
 

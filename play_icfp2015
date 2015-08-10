@@ -10,10 +10,7 @@ def mapper(args):
 
 
 def binary_selector(config):
-    if config['id'] == 23:
-        # problem 23 optimized binary.
-        return './solution.exe'
-    elif config['width'] <= 64 and config['height'] <= 64:
+    if config['width'] <= 64 and config['height'] <= 64:
         # bitboard optimized binary.
         return './solution_small.exe'
     else:
@@ -32,13 +29,15 @@ def main():
 
     if not args.p:
         args.p = known_phrases
+    if not args.t:
+        args.t = 3600
 
     pool = Pool(args.c)
     queries = []
     for conffile in args.f:
         config = json.load(conffile)
         for seed in config['sourceSeeds']:
-            queries.append((binary_selector(config), config, seed, args.p))
+            queries.append((binary_selector(config), config, seed, args.p, args.t))
 
     result = pool.map(mapper, queries)
     print json.dumps(result)

@@ -24,11 +24,11 @@ def create_single_output(config, seed, command, elapsed_time):
     }
 
 
-def run(exe_path, config, seed, phrases=None):
+def run(exe_path, config, seed, phrases=None, timelimit=3600):
     if phrases is None:
         phrases = []
     start_time = time.time()
-    input_string = translate_single(config, seed, phrases)
+    input_string = translate_single(config, seed, phrases, timelimit)
     proc = subprocess.Popen([exe_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     command, stderr = proc.communicate(input_string)
     if aidebug_dir:
