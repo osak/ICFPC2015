@@ -24,13 +24,16 @@ public class CommandLineOption extends Options {
 
     private final boolean debugMode;
     private final List<URL> problemFiles;
+    private int spellLength;
 
     private CommandLineOption(
             final boolean debugMode,
-            final List<URL> problemFiles
+            final List<URL> problemFiles,
+            int spellLength
     ) {
         this.debugMode = debugMode;
         this.problemFiles = problemFiles;
+        this.spellLength = spellLength;
     }
 
     public boolean isDebugMode() {
@@ -54,6 +57,9 @@ public class CommandLineOption extends Options {
         if (cl.hasOption("p")) {
             builder.problemFiles(new File(cl.getOptionValue("p")).listFiles());
         }
+        if (cl.hasOption("s")) {
+            builder.setN(Integer.valueOf(cl.getOptionValue("s")));
+        }
 
         return builder.build();
     }
@@ -62,9 +68,14 @@ public class CommandLineOption extends Options {
         return new Builder();
     }
 
+    public int getSpellLength() {
+        return spellLength;
+    }
+
     public static class Builder {
         private boolean debugMode = false;
         private List<URL> problemFiles = Lists.newArrayList();
+        private int n = 0;
 
         public Builder() {}
 
@@ -84,9 +95,14 @@ public class CommandLineOption extends Options {
             return this;
         }
 
+        public Builder setN(int n) {
+            this.n = n;
+            return this;
+        }
+
         public CommandLineOption build() {
             Preconditions.checkNotNull(problemFiles);
-            return new CommandLineOption(debugMode, problemFiles);
+            return new CommandLineOption(debugMode, problemFiles, n);
         }
     }
 
@@ -96,6 +112,7 @@ public class CommandLineOption extends Options {
         private Ops() {
             addOption("d", false, "Debug mode");
             addOption("p", "problem", true, "Problem files");
+            addOption("s", "spellLength", true, "Length of a spell");
         }
     }
 }

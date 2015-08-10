@@ -1,1 +1,1 @@
-java -cp ema.jar:lib/* icfpc.ema.Main -p ../problems
+java -cp "ema.jar:lib/*" icfpc.ema.Main -p ../problems

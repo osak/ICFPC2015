@@ -35,7 +35,6 @@ public class Main {
         final Scanner scanner = new Scanner(System.in);
 
         String phrase = scanner.nextLine();
-
         final List<TestResult> results = new PhraseTester(opts.getProblemFiles()).test(phrase).getResult();
         if (results.size() == 0) {
             Logger.getRootLogger().info("A game where spelling is possible has not found.");
@@ -46,7 +45,7 @@ public class Main {
         }
     }
 
-    private static void setLogger() {
+    public static void setLogger() {
         final PatternLayout layout = new PatternLayout();
         layout.setConversionPattern("%d %5p %c{1} - %m%n");
         final ConsoleAppender appender = new ConsoleAppender();
