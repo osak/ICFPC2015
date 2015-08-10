@@ -15,7 +15,7 @@ end
 CHUNK_SIZE = 1000
 
 Mongo::Logger.logger.level = ::Logger::INFO
-client = Mongo::Client.new(['52.10.8.174'], database: 'kadingel')
+client = Mongo::Client.new(['52.10.35.72'], database: 'kadingel')
 #client = Mongo::Client.new(['localhost'], database: 'kadingel')
 
 workdir = ARGV[0]
