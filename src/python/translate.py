@@ -33,7 +33,7 @@ def translate_single(config, seed, phrases=None):
         print >> output, rand.get() % len(config['units'])
     print >> output, len(phrases)
     for phrase in phrases:
-        print >> output, ''.join(map(str, input_mapper.command_to_move(phrase))).replace(str(input_mapper.IGNORED), '')
+        print >> output, len(phrase), ''.join(map(str, input_mapper.command_to_move(phrase))).replace(str(input_mapper.IGNORED), '')
     return output.getvalue()
 
 
