@@ -2,12 +2,13 @@ Team Gachi's ICFPC 2015 submission
 
 This project is a solution for ICFPC 2015 task.
 
-We would like to strongly recommend judges to see how our AI is doing well by
-following:
-  * Change `beamWidth` parameter in ai.cpp:13 to 2000.
-  * Compile it.
-  * Run on problem 23 and see how he does.
-
+# Team Members
+ * Yuki Kawata (kawatea)
+ * Masata Kida
+ * Yu Fujikake
+ * Tomoyuki Hazehata (hyon)
+ * Shunsuke Ohashi (amylase)
+ * Osamu Koga (osa_k)
 
 Product List
  * AI
@@ -27,7 +28,11 @@ Product List
   mongodb API endpoint.
 
  * ema
-  Detect phrase of power automatically using official score board.
+  Given a candidate for phrase of power, returns the safe problem and seed to
+  check it.
+
+ * kanade
+  Detect phrase of power by posting candidates to official server.
 
  * fine
   Write a AI outputs into mongodb from Jenkins.

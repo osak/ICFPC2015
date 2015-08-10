@@ -206,13 +206,17 @@ public class Board {
                     }
                 }
                 if (casted) {
-                    if (!castedSpells.keySet().contains(spell)) {
+                    if (!castedSpells.keySet().contains(spell.phrase)) {
                         castedSpells.put(spell.phrase, 1);
                         castedNow = spell.phrase;
                         powerScore += 300;
                     }
                     LOGGER.info("CASTED: " + spell.phrase);
-                    castedSpells.put(spell.phrase, castedSpells.get(spell.phrase) + 1);
+                    if (castedSpells.containsKey(spell.phrase)) {
+                        castedSpells.put(spell.phrase, 1);
+                    } else {
+                        castedSpells.put(spell.phrase, castedSpells.get(spell.phrase) + 1);
+                    }
                     powerScore += 2 * spell.phrase.length();
                 }
             }
