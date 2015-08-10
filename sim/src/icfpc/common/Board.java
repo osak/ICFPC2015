@@ -227,6 +227,7 @@ public class Board {
      * @return false if locked
      */
     public boolean operate(final char command) {
+        castedNow = null;
         allCommands.add(command);
         return operate(Command.fromChar(command));
     }
