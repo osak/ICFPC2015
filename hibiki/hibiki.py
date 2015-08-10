@@ -194,6 +194,7 @@ def get_all_output(query=None):
 
 def render_output_table_page(query, template_name):
     outputs = get_all_output(query=query)
+    outputs.sort(key=lambda doc: (-int(doc['runDateUtc']), doc['problemId'], doc['seed']))
     output_base_url = 'http://icfpc.osak.jp/akatsuki/{api}/{problemId}/{seed}/{revision}/'
     visualiser_base_url = 'http://icfpc.osak.jp/nastasja/index.html?revision={revision}&problemId={problemId}&seed={seed}'
     for output in outputs:
