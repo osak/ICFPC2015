@@ -46,14 +46,15 @@ public class Board {
     private Angle currentAngle;
     private Randomizer randomizer;
     private boolean gameInProgress = true;
-    private int prevClearedRows = 0;
-    private int moveScore = 0;
-    private int powerScore = 0;
+    private int prevClearedRows;
+    private int moveScore;
+    private int powerScore;
     private int spawnedUnitCount = 0;
     private boolean isNewUnit;
     private Set<Set<Cell>> moveHistory;
     public String memo;
     private SimpleBoardDiff diff = null;
+    private String castedNow = null;
     // TODO そもそもボード以外の状態を切り分ける
 
     public Board(final GameSettings gameSettings, final Randomizer randomizer, final Collection<? extends Cell> filled) {
@@ -177,7 +178,6 @@ public class Board {
         }
 
         accMoveScore(currentUnit.members.size(), clearedRowCount);
-        accPowerScore();
         prevClearedRows = clearedRowCount;
         filled = newFilled;
         currentUnit = null;
@@ -191,20 +191,6 @@ public class Board {
     }
 
     private void accPowerScore() {
-        powerScore += 0;
-    }
-
-    public int getScore() {
-        return moveScore + powerScore;
-    }
-
-    /**
-     *
-     * @param command cmd
-     * @return false if locked
-     */
-    public boolean operate(final char command) {
-        allCommands.add(command);
         for (Spell spell : Spell.values()) {
             if (allCommands.size() >= spell.phrase.length()) {
                 boolean casted = true;
@@ -218,6 +204,7 @@ public class Board {
                 if (casted) {
                     if (!castedSpells.contains(spell)) {
                         castedSpells.add(spell);
+                        castedNow = spell.phrase;
                         powerScore += 300;
                     }
                     LOGGER.info("CASTED: " + spell.phrase);
@@ -228,10 +215,24 @@ public class Board {
         // TODO Phraseの詳細
         // invalidでもいい？
         // ゲームが終了してもいい？
+    }
+
+    public int getScore() {
+        return moveScore + powerScore;
+    }
+
+    /**
+     *
+     * @param command cmd
+     * @return false if locked
+     */
+    public boolean operate(final char command) {
+        allCommands.add(command);
         return operate(Command.fromChar(command));
     }
 
     private boolean operate(final Command command) {
+        LOGGER.info(command.toString());
         if (!gameInProgress) {
             LOGGER.warn("Game has ended.");
             diff = null;
@@ -268,7 +269,7 @@ public class Board {
                 break;
             case NOOP:
                 diff = null;
-                return true;
+                break;
             case INVALID:
                 violateRule("invalid move");
                 diff = null;
@@ -276,24 +277,28 @@ public class Board {
             default:
                 throw new Error("WOW");
         }
-        if (!check(currentUnit, newUnitPivot, newAngle)) {
-            final Set<Cell> prevFilled = ImmutableSet.copyOf(filled);
-            lock();
-            diff = new SimpleBoardDiff(Sets.difference(filled, prevFilled), Sets.difference(prevFilled, filled), getUnitCells(), currentUnitPivot, getScore());
-            isNewUnit = true;
-            return false; // LOCKED!!
-        } else {
-            diff = new SimpleBoardDiff(Collections.<Cell>emptyList(), Collections.<Cell>emptyList(), getUnitCells(currentUnit, newUnitPivot, newAngle), newUnitPivot, getScore());
-            currentUnitPivot = newUnitPivot;
-            currentAngle = newAngle;
 
-            if (!historyCheck()) {
-                violateRule("same history");
-                return false;
+        if (command != Command.NOOP) {
+            if (!check(currentUnit, newUnitPivot, newAngle)) {
+                final Set<Cell> prevFilled = ImmutableSet.copyOf(filled);
+                lock();
+                diff = new SimpleBoardDiff(Sets.difference(filled, prevFilled), Sets.difference(prevFilled, filled), getUnitCells(), currentUnitPivot, getScore());
+                isNewUnit = true;
+                accPowerScore();
+                return false; // LOCKED!!
+            } else {
+                diff = new SimpleBoardDiff(Collections.<Cell>emptyList(), Collections.<Cell>emptyList(), getUnitCells(currentUnit, newUnitPivot, newAngle), newUnitPivot, getScore());
+                currentUnitPivot = newUnitPivot;
+                currentAngle = newAngle;
+
+                if (!historyCheck()) {
+                    violateRule("same history");
+                    return false;
+                }
             }
-
-            return true;
         }
+        accPowerScore();
+        return true;
     }
 
     private boolean historyCheck() {
@@ -412,6 +417,7 @@ public class Board {
             gen.writeNumberField("moveScore", value.moveScore);
             gen.writeNumberField("powerScore", value.powerScore);
             gen.writeNumberField("clearedRows", value.prevClearedRows);
+            gen.writeStringField("castedNow", value.castedNow);
             //gen.writeNumberField("width", value.gameSettings.width);
             //gen.writeNumberField("height", value.gameSettings.height);
             //gen.writeNumberField("maxSources", value.gameSettings.maxSources);
