@@ -1,6 +1,7 @@
 import translate
 from runner import get_path
 import json
+import phrases
 
 def main():
     for i in xrange(25):
@@ -10,7 +11,7 @@ def main():
         for seed in config['sourceSeeds']:
             dest_path = '../../cpp_input/problem_{0}_{1}.txt'.format(i, seed)
             with open(dest_path, 'w') as writer:
-                writer.write(translate.translate_single(config, seed))
+                writer.write(translate.translate_single(config, seed, phrases.known_phrases))
 
 
 if __name__ == '__main__':
