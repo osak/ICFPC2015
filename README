@@ -31,9 +31,6 @@ Product List
   Given a candidate for phrase of power, returns the safe problem and seed to
   check it.
 
- * kanade
-  Detect phrase of power by posting candidates to official server.
-
  * fine
   Write a AI outputs into mongodb from Jenkins.
 
@@ -43,6 +40,8 @@ Product List
  * ikazuchi
   leaderboard watcher process.
 
+ * kanade
+  Detect phrase of power by posting candidates to official server.
 
  * nastasja
   Game visualizer integrated with mongodb (akatsuki API).
