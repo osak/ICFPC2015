@@ -1,7 +1,8 @@
 import json
 import sys
 from StringIO import StringIO
-
+import input_mapper
+from phrases import known_phrases
 
 class Rand(object):
     def __init__(self, seed):
@@ -13,7 +14,9 @@ class Rand(object):
         return ret
 
 
-def translate_single(config, seed):
+def translate_single(config, seed, phrases=None):
+    if phrases is None:
+        phrases = []
     output = StringIO()
     print >> output, config['height'], config['width']
     print >> output, len(config['units'])
@@ -28,13 +31,16 @@ def translate_single(config, seed):
     rand = Rand(seed)
     for i in xrange(config['sourceLength']):
         print >> output, rand.get() % len(config['units'])
+    print >> output, len(phrases)
+    for phrase in phrases:
+        print >> output, ''.join(map(str, input_mapper.command_to_move(phrase)))
     return output.getvalue()
 
 
-def translate(config):
+def translate(config, phrases=None):
     output = StringIO()
     for seed in config['sourceSeeds']:
-        output.write(translate_single(config, seed))
+        output.write(translate_single(config, seed, phrases))
     return output.getvalue()
 
 
@@ -47,9 +53,9 @@ def main():
     with open(path) as reader:
         config = json.load(reader)
     if len(sys.argv) == 2:
-        print translate(config)
+        print translate(config, known_phrases)
     else:
-        print translate_single(config, config['sourceSeeds'][int(sys.argv[2])])
+        print translate_single(config, config['sourceSeeds'][int(sys.argv[2])], known_phrases)
 
 
 if __name__ == '__main__':

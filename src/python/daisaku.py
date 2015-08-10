@@ -3,10 +3,8 @@ from argparse import ArgumentParser
 import input_mapper
 from StringIO import StringIO
 
-spell_list = ['ei!', 'ia! ia!', "r'lyeh", "in his house at r'lyeh dead cthulhu waits dreaming.", "yogsothoth"]
 
-
-def optimize(command):
+def optimize(command, spell_list):
     moves = input_mapper.command_to_move(command)
     spell_moves = [input_mapper.command_to_move(spell) for spell in spell_list]
 

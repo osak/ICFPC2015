@@ -7,16 +7,16 @@ cw = frozenset({"d", "q", "r", "v", "z", "1"})
 ccw = frozenset({"k", "s", "t", "u", "w", "x"})
 ignored = frozenset({"\r", "\n", "\t"})
 
-W = 0
-E = 1
-SW = 2
-SE = 3
-CW = 4
-CCW = 5
-IGNORED = 6
+E = 0
+W = 1
+SE = 2
+SW = 3
+CCW = 4
+IGNORED = 5
+CW = 6
 
 mapper = {w: W, e: E, sw: SW, se: SE, cw: CW, ccw: CCW, ignored: IGNORED}
-move_name = ['w', 'e', 'sw', 'se', 'cw', 'ccw', 'ignored']
+move_name = ['e', 'w', 'se', 'sw', 'ccw', 'ignored', 'cw']
 
 valid = frozenset()
 for cs in mapper:
@@ -46,7 +46,7 @@ if __name__ == '__main__':
         if c not in valid:
             print '!!! invalid character:', c
             exit(1)
-        idx = command_to_move(c)
+        idx = com2move[c]
         if idx == IGNORED:
             continue
         print move_name[idx]
