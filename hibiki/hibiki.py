@@ -177,7 +177,9 @@ def get_all_output(query=None):
     client = pymongo.MongoClient(MONGO_URI)
     logger.info('collect all output.')
     cursor = client.kadingel.output.find(query, projection={'_id': False})
-    documents = list(cursor.sort([('runDateUtc', pymongo.DESCENDING), ('problemId', pymongo.ASCENDING), ('seed', pymongo.ASCENDING)]))
+    # documents = list(cursor.sort([('runDateUtc', pymongo.DESCENDING), ('problemId', pymongo.ASCENDING), ('seed', pymongo.ASCENDING)]))
+    documents = list(cursor)
+
     client.close()
     # filter duplicated docs
     result = []
