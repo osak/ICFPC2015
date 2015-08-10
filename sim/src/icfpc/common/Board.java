@@ -383,6 +383,10 @@ public class Board {
         return new Cell((rightSpace - leftSpace) / 4 * 2 - (topmost % 2 != 0 ? 1 : 0), -topmost);
     }
 
+    public String getCastedNow() {
+        return castedNow;
+    }
+
     public static class Serializer extends JsonSerializer<Board> {
         @Override
         public void serialize(Board value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
