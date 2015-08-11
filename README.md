@@ -1,8 +1,10 @@
-Team Gachi's ICFPC 2015 submission
+#Team Gachi's ICFPC 2015 submission
 
 This project is a solution for ICFPC 2015 task.
 
-# Team Members
+AI is separated to another repository: [ICFPC2015-AI](https://github.com/osak/ICFPC2015-AI)
+
+## Team Members
  * Yuki Kawata (kawatea)
  * Masata Kida
  * Yu Fujikake
@@ -10,7 +12,7 @@ This project is a solution for ICFPC 2015 task.
  * Shunsuke Ohashi (amylase)
  * Osamu Koga (osa_k)
 
-Product List
+##Product List
  * AI
   This AI consists of several sub-AIs which handle different situations to make up their weakness mutually.
   * God
